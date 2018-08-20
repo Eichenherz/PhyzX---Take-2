@@ -385,12 +385,12 @@ void Graphics::Clip_Draw_line( FVec2 p1, FVec2 p2, Color c )
 	const auto code1 = out_code( p1 );
 	const auto code2 = out_code( p2 );
 
-	if ( code1 | code2 == 0 )
+	if ( (code1 | code2) == 0 )
 	{
 		// Trivial acception
 		Draw_Line( p1, p2, c );
 	}
-	if ( code1 & code2 != 0 )
+	if ( (code1 & code2) != 0 )
 	{
 		// Trivial rejection
 		return;
