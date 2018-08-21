@@ -93,17 +93,17 @@ public:
 		return *this;
 	}
 
-	T dot( const Vec3_& vec1, const Vec3_& vec2 )
+	T dot( const Vec3_& vec1 ) const
 	{
-		return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+		return vec1.x * this->x + vec1.y * this->y + vec1.z * this->z;
 	}
 
-	Vec3_ cross( const Vec3_& u, const Vec3_& v )
+	Vec3_ cross( const Vec3_& v ) const 
 	{
 		return {
-			u.y * v.z - u.z * v.y,
-			u.z * v.x - u.x * v.z,
-			u.x * v.y - u.y * v.x };
+			this->y * v.z - this->z * v.y,
+			this->z * v.x - this->x * v.z,
+			this->x * v.y - this->y * v.x };
 	}
 
 public:

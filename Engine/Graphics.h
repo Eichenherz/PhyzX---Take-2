@@ -64,8 +64,8 @@ public:
 		PutPixel( x, y, { unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
 	}
 	void PutPixel( int x, int y, Color c );
-	void Draw_Line( FVec2 p1, FVec2 p2, Color c );
-	void Clip_Draw_line( FVec2 p1, FVec2 p2, Color c );
+	void Draw_Line( const FVec2& p1, const FVec2& p2, Color c );
+	void Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c );
 	void Draw_Closed_Polyline( Iter begin, Iter end, Color c );
 
 private:
