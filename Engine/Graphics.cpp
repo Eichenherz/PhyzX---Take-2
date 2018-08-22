@@ -369,19 +369,19 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 
 		if ( v.x < x_min )           // to the left of clip window
 		{
-			code = 0b1000;//code += 1 << 3;
+			code += 1 << 3;
 		}
 		else if ( v.x >= x_max )      // to the right of clip window
 		{
-			code = 0b0100;//code += 1 << 2;
+			code += 1 << 2;
 		}
 		if ( v.y < y_min )           // below the clip window
 		{
-			code |= 0b1001;//code += 1;
+			code += 1;
 		}
 		else if ( v.y >= y_max )      // above the clip window
 		{
-			code |= 0b0010;//code += 1 << 1;
+			code += 1 << 1;
 		}
 
 		return code;
@@ -460,17 +460,17 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 		TAB_entry { 255,255,255 },// N/A VALUE
 		TAB_entry { 0,	3,	0b0100 },
 		TAB_entry { 0,	1,	0b0100 },
-		TAB_entry { 1,	3,	0b0010 },
+		TAB_entry { 1,	3,	0b0100 },
 		TAB_entry { 1,	2,	0b0010 },
 		TAB_entry { 255, 255,255 },
 		TAB_entry { 0,	2,	0b0100 },
+		TAB_entry { 2,	3,	0b0110 },
 		TAB_entry { 2,	3,	0b1000 },
-		TAB_entry { 2,	3,	0b1000 },
-		TAB_entry { 0,	2,	0b0100 },
+		TAB_entry { 0,	2,	0b0001 },
 		TAB_entry { 255, 255,255 },
-		TAB_entry { 1,	2,	0b0010 },
+		TAB_entry { 1,	2,	0b0101 },
 		TAB_entry { 1,	3,	0b0010 },
-		TAB_entry { 0,	1,	0b0100 },
+		TAB_entry { 0,	1,	0b1001 },
 		TAB_entry { 0,	3,	0b0100 }
 	};
 
