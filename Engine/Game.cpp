@@ -71,7 +71,7 @@ void Game::UpdateModel()
 	pos = delta_pos;
 
 	box.Transform( PX_Pose_Data { pos,angle } );
-	mouse_pos = wnd.mouse.GetPos();
+	//mouse_pos = wnd.mouse.GetPos();
 }
 
 void Game::ComposeFrame()
@@ -80,7 +80,7 @@ void Game::ComposeFrame()
 	//box.Draw_test( gfx, Colors::Blue );
 	//box.Draw( gfx, Colors::White );
 	
-	//IVec2 mouse_pos = { 70,300 };
+	IVec2 mouse_pos = { 700,300 };
 	gfx.draw_line_test( FVec2(mouse_pos), { 400.0f,300.0f }, Colors::Blue );
 	gfx.Draw_Clipped_Line( FVec2(mouse_pos), { 400.0f,300.0f }, Colors::Green );
 }

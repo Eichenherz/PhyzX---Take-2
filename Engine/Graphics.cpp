@@ -369,29 +369,25 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 
 		if ( v.x < x_min )           // to the left of clip window
 		{
-			code += 1 << 3;
+			code = 0b1000;//code += 1 << 3;
 		}
 		else if ( v.x >= x_max )      // to the right of clip window
 		{
-			code += 1 << 2;
+			code = 0b0100;//code += 1 << 2;
 		}
 		if ( v.y < y_min )           // below the clip window
 		{
-			code += 1;
+			code |= 0b1001;//code += 1;
 		}
 		else if ( v.y >= y_max )      // above the clip window
 		{
-			code += 1 << 1;
+			code |= 0b0010;//code += 1 << 1;
 		}
 
 		return code;
 	};
 	
-	// Order the pts
-	if ( ( p1.x >= p2.x ) || ( p1.y >= p2.y ) )
-	{
-		std::swap( p1, p2 );
-	}
+	
 
 	const auto code1 = out_code( p1 ); 
 	const auto code2 = out_code( p2 );
@@ -412,10 +408,10 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 	// Homogeneous coordinates
 	const std::array<FVec3, 4> clip_window_vertices =
 	{
-		FVec3 { x_min, y_max, 1.0f },
-		FVec3 { x_max, y_max, 1.0f },
+		FVec3 { x_min, y_min, 1.0f },
 		FVec3 { x_max, y_min, 1.0f },
-		FVec3 { x_min, y_min, 1.0f }
+		FVec3 { x_max, y_max, 1.0f },
+		FVec3 { x_min, y_max, 1.0f }
 	};
 
 	const std::array<FVec3, 4> clip_window_edges =
@@ -464,13 +460,13 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 		TAB_entry { 255,255,255 },// N/A VALUE
 		TAB_entry { 0,	3,	0b0100 },
 		TAB_entry { 0,	1,	0b0100 },
-		TAB_entry { 3,	1,	0b0010 },
+		TAB_entry { 1,	3,	0b0010 },
 		TAB_entry { 1,	2,	0b0010 },
 		TAB_entry { 255, 255,255 },
 		TAB_entry { 0,	2,	0b0100 },
 		TAB_entry { 2,	3,	0b1000 },
 		TAB_entry { 2,	3,	0b1000 },
-		TAB_entry { 2,	0,	0b0100 },
+		TAB_entry { 0,	2,	0b0100 },
 		TAB_entry { 255, 255,255 },
 		TAB_entry { 1,	2,	0b0010 },
 		TAB_entry { 1,	3,	0b0010 },
