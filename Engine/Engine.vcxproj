@@ -149,6 +149,8 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Matrix2.h" />
     <ClInclude Include="Mouse.h" />
+    <ClInclude Include="PX_Box_Shape.h" />
+    <ClInclude Include="PX_Physical_Traits.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
@@ -167,6 +169,8 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Matrix2.cpp" />
     <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="PX_Box_Shape.cpp" />
+    <ClCompile Include="PX_Physical_Traits.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>

@@ -24,7 +24,10 @@
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+	pose( { 400.0f,300.0f }, angle ),
+	box( pose.pos, 100.0f, 100.0f ),
+	clip_window ( pose.pos, 400.0f, 400.0f )
 {
 }
 
@@ -38,8 +41,46 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	if ( wnd.mouse.LeftIsPressed()  )
+	{
+		angle += Radians { 0.10f };
+	}
+	if ( wnd.mouse.RightIsPressed() )
+	{
+		angle += Radians { -0.10f };
+	}
+
+	FVec2 delta_pos { 0,0 };
+	if ( wnd.kbd.KeyIsPressed( VK_UP ) )
+	{
+		delta_pos += { 0, -1 };
+	}
+	else if ( wnd.kbd.KeyIsPressed( VK_DOWN ) )
+	{
+		delta_pos += { 0, 1 };
+	}
+	else if ( wnd.kbd.KeyIsPressed( VK_LEFT ) )
+	{
+		delta_pos += { -1, 0 };
+	}
+	else if ( wnd.kbd.KeyIsPressed( VK_RIGHT ) )
+	{
+		delta_pos += { 1, 0 };
+	}
+
+	pos = delta_pos;
+
+	box.Transform( PX_Pose_Data { pos,angle } );
+	mouse_pos = wnd.mouse.GetPos();
 }
 
 void Game::ComposeFrame()
 {
+	clip_window.Draw_test( gfx, Colors::Red );
+	//box.Draw_test( gfx, Colors::Blue );
+	//box.Draw( gfx, Colors::White );
+	
+	//IVec2 mouse_pos = { 70,300 };
+	gfx.draw_line_test( FVec2(mouse_pos), { 400.0f,300.0f }, Colors::Blue );
+	gfx.Draw_Clipped_Line( FVec2(mouse_pos), { 400.0f,300.0f }, Colors::Green );
 }

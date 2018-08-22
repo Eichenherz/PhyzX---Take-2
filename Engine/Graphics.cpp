@@ -306,7 +306,8 @@ void Graphics::EndFrame()
 void Graphics::BeginFrame()
 {
 	// clear the sysbuffer
-	memset( pSysBuffer,0u,sizeof( Color ) * Graphics::ScreenHeight * Graphics::ScreenWidth );
+	//memset( pSysBuffer,0u,sizeof( Color ) * Graphics::ScreenHeight * Graphics::ScreenWidth );
+	std::fill( pSysBuffer, pSysBuffer + Graphics::ScreenHeight * Graphics::ScreenWidth, Colors::Black );
 }
 
 void Graphics::PutPixel( int x,int y,Color c )
@@ -318,16 +319,17 @@ void Graphics::PutPixel( int x,int y,Color c )
 	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
 }
 
-void Graphics::Draw_Line( const FVec2& p1, const FVec2& p2, Color c )
+void Graphics::Draw_Line( FVec2 p1, FVec2 p2, Color c )
 {
-	const float	slope = p2.y - p1.y / p2.x - p1.x;
-
-	// Points are assumed to be ordered by the Draw_Clipped_Line routine
-	//p2.x = std::max( p1.x, p2.x );
-	//p2.y = std::max( p1.y, p2.y );
+	const float	slope = (p2.y - p1.y )/ (p2.x - p1.x);
 
 	if ( std::fabs( slope ) > 1.0f )
 	{
+		if ( p1.y > p2.y )
+		{
+			std::swap( p1.y, p2.y );
+			std::swap( p1.x, p2.x );
+		}
 		const float inv_slope = 1.0f / slope;
 		for ( int y = (int) p1.y, y_end = (int) p2.y; y < y_end; ++y )
 		{
@@ -337,6 +339,12 @@ void Graphics::Draw_Line( const FVec2& p1, const FVec2& p2, Color c )
 	} 
 	else 
 	{
+		if ( p1.x > p2.x )
+		{
+			std::swap( p1.x, p2.x );
+			std::swap( p1.y, p2.y );
+		}
+
 		for ( int x = int( p1.x ), x_end = int( p2.x ); x < x_end; ++x )
 		{
 			const int y = int( slope * ( float( x ) - p1.x ) + float( p1.y ) );
@@ -348,27 +356,43 @@ void Graphics::Draw_Line( const FVec2& p1, const FVec2& p2, Color c )
 
 void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 {
+	constexpr float x_min = 200.0f;
+	constexpr float x_max = 600.0f;
+	constexpr float y_min = 100.0f;
+	constexpr float y_max = 500.0f;
+
 	std::function<unsigned char( const FVec2& )> out_code = [&] ( const FVec2& v )
 	{
-		const unsigned char LEFT = 1;   // 0001
-		const unsigned char RIGHT = 2;  // 0010
-		const unsigned char BOTTOM = 4; // 0100
-		const unsigned char TOP = 8;    // 1000
+		// { LEFT/RIGHT/TOP/BOTTOM } bit positioning
 
-		unsigned char code = 0;    // 0000 code fo inside window
+		unsigned char code = 0;    // 0000 code for inside window
 
-		if ( v.x < 0.0f )           // to the left of clip window
-			code |= LEFT;
-		else if ( v.x >= ScreenWidth )      // to the right of clip window
-			code |= RIGHT;
-		if ( v.y < 0.0f )           // below the clip window
-			code |= BOTTOM;
-		else if ( v.y >= ScreenHeight )      // above the clip window
-			code |= TOP;
+		if ( v.x < x_min )           // to the left of clip window
+		{
+			code += 1 << 3;
+		}
+		else if ( v.x >= x_max )      // to the right of clip window
+		{
+			code += 1 << 2;
+		}
+		if ( v.y < y_min )           // below the clip window
+		{
+			code += 1;
+		}
+		else if ( v.y >= y_max )      // above the clip window
+		{
+			code += 1 << 1;
+		}
 
 		return code;
 	};
 	
+	// Order the pts
+	if ( ( p1.x >= p2.x ) || ( p1.y >= p2.y ) )
+	{
+		std::swap( p1, p2 );
+	}
+
 	const auto code1 = out_code( p1 ); 
 	const auto code2 = out_code( p2 );
 
@@ -376,7 +400,7 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 	if ( (code1 | code2) == 0 )
 	{
 		// Trivial acception
-		Draw_Line( p1, p2, c );
+		return Draw_Line( p1, p2, c );
 	}
 	if ( (code1 & code2) != 0 )
 	{
@@ -386,24 +410,21 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 
 	// Non trivial cases
 	// Homogeneous coordinates
-	const std::array<FVec3, 4> clip_window_edges =
-	{
-		FVec3{  1.0f,  0.0f, 1.0f },
-		FVec3{  0.0f, -1.0f, 1.0f },
-		FVec3{ -1.0f,  0.0f, 1.0f },
-		FVec3{  0.0f,  1.0f, 1.0f }
-	};
 	const std::array<FVec3, 4> clip_window_vertices =
 	{
-		FVec3 { 0.0f,				float(ScreenHeight), 1.0f },
-		FVec3 { float(ScreenWidth), float(ScreenHeight), 1.0f },
-		FVec3 { float(ScreenWidth), 0.0f,				 1.0f },
-		FVec3 {  0.0f,				0.0f,				 1.0f }
+		FVec3 { x_min, y_max, 1.0f },
+		FVec3 { x_max, y_max, 1.0f },
+		FVec3 { x_max, y_min, 1.0f },
+		FVec3 { x_min, y_min, 1.0f }
 	};
 
-	// Order the pts
-	p2.x = std::max( p1.x, p2.x );
-	p2.y = std::max( p1.y, p2.y );
+	const std::array<FVec3, 4> clip_window_edges =
+	{
+		clip_window_vertices [0].cross( clip_window_vertices [1] ),
+		clip_window_vertices [1].cross( clip_window_vertices [2] ),
+		clip_window_vertices [2].cross( clip_window_vertices [3] ),
+		clip_window_vertices [3].cross( clip_window_vertices [0] )
+	};
 
 	auto u0 = make_homogenous( p1 );
 	auto u1 = make_homogenous( p2 );
@@ -430,7 +451,7 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 		unsigned char TAB1;
 		unsigned char TAB2;
 		unsigned char MASK;
-
+	
 		constexpr TAB_entry( unsigned char t1, unsigned char t2, unsigned char m )
 			:
 			TAB1 { t1 },
@@ -443,13 +464,13 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 		TAB_entry { 255,255,255 },// N/A VALUE
 		TAB_entry { 0,	3,	0b0100 },
 		TAB_entry { 0,	1,	0b0100 },
-		TAB_entry { 1,	3,	0b0010 },
+		TAB_entry { 3,	1,	0b0010 },
 		TAB_entry { 1,	2,	0b0010 },
 		TAB_entry { 255, 255,255 },
 		TAB_entry { 0,	2,	0b0100 },
 		TAB_entry { 2,	3,	0b1000 },
 		TAB_entry { 2,	3,	0b1000 },
-		TAB_entry { 0,	2,	0b0100 },
+		TAB_entry { 2,	0,	0b0100 },
 		TAB_entry { 255, 255,255 },
 		TAB_entry { 1,	2,	0b0010 },
 		TAB_entry { 1,	3,	0b0010 },
@@ -460,22 +481,42 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 	const auto i = LUT [clip_code].TAB1;
 	const auto j = LUT [clip_code].TAB2;
 
+	if ( ( i == 255 ) || ( j == 255 ) ) return;
+
 	if ( ( code1 != 0 ) && ( code2 != 0 ) )
 	{
-		u0 = u0.cross( clip_window_edges [i] );
-		u1 = u1.cross( clip_window_edges [j] );
+		u0 = line.cross( clip_window_edges [i] );
+		u1 = line.cross( clip_window_edges [j] );
 	}
 	else if ( code1 == 0 ) // clip u1
 	{
-		u1 =	( ( code2 & LUT [clip_code].MASK ) != 0 ) ?
-				u1.cross( clip_window_edges [i] ) :
-				u1.cross( clip_window_edges [j] );
+		//u1 =	( ( code2 & LUT [clip_code].MASK ) != 0 ) ?
+		//		line.cross( clip_window_edges [i] ) :
+		//		line.cross( clip_window_edges [j] );
+
+		if ( ( code2 & LUT [clip_code].MASK ) != 0 )
+		{
+			u1 = line.cross( clip_window_edges [i] );
+		}
+		else
+		{
+			u1 = line.cross( clip_window_edges [j] );
+		}
 	}
 	else if ( code2 == 0 ) // clip u0
 	{
-		u0 =	( ( code1 & LUT [clip_code].MASK ) != 0 ) ?
-				u0.cross( clip_window_edges [i] ) :
-				u0.cross( clip_window_edges [j] );
+		//u0 =	( ( code1 & LUT [clip_code].MASK ) != 0 ) ?
+		//		line.cross( clip_window_edges [i] ) :
+		//		line.cross( clip_window_edges [j] );
+
+		if ( ( code1 & LUT [clip_code].MASK ) != 0 )
+		{
+			u0 = line.cross( clip_window_edges [i] );
+		}
+		else
+		{
+			u0 = line.cross( clip_window_edges [j] );
+		}
 	}
 
 	Draw_Line( { u0.x / u0.z, u0.y / u0.z }, 
@@ -487,9 +528,54 @@ void Graphics::Draw_Closed_Polyline( Iter beg, Iter end, Color c )
 {
 	for ( auto I = beg, last = std::prev( end ); I != last; ++I )
 	{
-		Draw_Line( *I, *std::next( I ), c );
+		Draw_Clipped_Line( *I, *std::next( I ), c );
 	}
-	Draw_Line( *std::prev( end ), *beg, c );
+	Draw_Clipped_Line( *std::prev( end ), *beg, c );
+}
+
+void Graphics::draw_line_test( FVec2 p1, FVec2 p2, Color c )
+{
+	const float	slope = (p2.y - p1.y) / (p2.x - p1.x);
+	
+	if ( std::fabs( slope ) > 1.0f )
+	{
+		if ( p1.y > p2.y )
+		{
+			std::swap( p1.y, p2.y );
+			std::swap( p1.x, p2.x );
+		}
+
+		const float inv_slope = 1.0f / slope;
+		for ( int y = (int) (p1.y + 0.5f) , y_end = (int) p2.y; y < y_end; ++y )
+		{
+			const int x = int( inv_slope * ( float( y ) - p1.y ) + p1.x );
+			PutPixel( x, y, c );
+		}
+	}
+	else
+	{
+		if ( p1.x > p2.x )
+		{
+			std::swap( p1.x, p2.x );
+			std::swap( p1.y, p2.y );
+		}
+
+		for ( int x = int( p1.x + 0.5f), x_end = int( p2.x ); x < x_end; ++x )
+		{
+			const int y = int( slope * ( float( x ) - p1.x ) + float( p1.y ) );
+			PutPixel( x, y, c );
+		}
+
+	}
+}
+
+void Graphics::draw_polyline_test( Iter beg, Iter end, Color c )
+{
+	for ( auto I = beg, last = std::prev( end ); I != last; ++I )
+	{
+		draw_line_test( *I, *std::next( I ), c );
+	}
+	draw_line_test( *std::prev( end ), *beg, c );
 }
 
 

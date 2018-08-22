@@ -23,6 +23,8 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
+#include "PX_Box_Shape.h"
+#include "PX_Physical_Traits.h"
 
 class Game
 {
@@ -42,5 +44,13 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
+	Radians					angle = 0.0f;
+	FVec2					pos = { 0.0f,0.0f };
+	PX_Pose_Data			pose;
+
+	IVec2					mouse_pos = {100, 100};
+
+	PX_Box_Shape box;
+	PX_Box_Shape clip_window;
 	/********************************/
 };

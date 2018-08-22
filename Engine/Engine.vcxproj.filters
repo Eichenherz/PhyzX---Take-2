@@ -72,6 +72,12 @@
     <ClInclude Include="..\..\PhyzX - Project\Engine\PX_Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PX_Box_Shape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PX_Physical_Traits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -108,6 +114,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\PhyzX - Project\Engine\PX_Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PX_Box_Shape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PX_Physical_Traits.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
