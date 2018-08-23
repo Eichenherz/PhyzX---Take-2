@@ -356,10 +356,11 @@ void Graphics::Draw_Line( FVec2 p1, FVec2 p2, Color c )
 
 void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 {
-	constexpr float x_min = 200.0f;
-	constexpr float x_max = 600.0f;
-	constexpr float y_min = 100.0f;
-	constexpr float y_max = 500.0f;
+	constexpr float x_min = 0.0f;//200.0f;
+	constexpr float x_max = float( ScreenWidth - 1 );//600.0f;
+	constexpr float y_min = 0.0f; //100.0f;
+	constexpr float y_max = float( ScreenHeight - 1 );//500.0f;
+
 
 	std::function<unsigned char( const FVec2& )> out_code = [&] ( const FVec2& v )
 	{
@@ -386,7 +387,6 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 
 		return code;
 	};
-	
 	const auto code1 = out_code( p1 ); 
 	const auto code2 = out_code( p2 );
 
@@ -402,120 +402,61 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 		return;
 	}
 
+
 	// Non trivial cases
-	// Homogeneous coordinates
-	const std::array<FVec3, 4> clip_window_vertices =
-	{
-		FVec3 { x_min, y_min, 1.0f },
-		FVec3 { x_max, y_min, 1.0f },
-		FVec3 { x_max, y_max, 1.0f },
-		FVec3 { x_min, y_max, 1.0f }
+	float                        t_min = 0.0f;
+	float                        t_max = 1.0f;
+
+	const std::array<FVec2, 4>    screen_normals = {
+		FVec2 {  0.0f,-1.0f },
+		FVec2 {  1.0f, 0.0f },
+		FVec2 {  0.0f, 1.0f },
+		FVec2 { -1.0f, 0.0f }	 
 	};
 
-	const std::array<FVec3, 4> clip_window_edges =
-	{
-		clip_window_vertices [0].cross( clip_window_vertices [1] ),
-		clip_window_vertices [1].cross( clip_window_vertices [2] ),
-		clip_window_vertices [2].cross( clip_window_vertices [3] ),
-		clip_window_vertices [3].cross( clip_window_vertices [0] )
+	const std::array<FVec2, 4>    screen_vertices = {
+		FVec2 { x_min, y_min },
+		FVec2 { x_max, y_min },
+		FVec2 { x_max, y_max },
+		FVec2 { x_min, y_max }
 	};
 
-	auto u0 = make_homogenous( p1 );
-	auto u1 = make_homogenous( p2 );
-	const auto line = u0.cross( u1 );
-
-	unsigned char clip_code = 0;
-
-	for ( size_t idx = 0; idx < 4; ++idx )
-	{
-		const auto projection = clip_window_vertices[idx].dot( line );
-		clip_code +=	( projection >= 0 ) ? 
-						( 1 << idx ) : 
-						( 0 << idx );
-	}
 	
-	if ( ( clip_code == 0x00 ) || ( clip_code == 0x0F ) )
-	{
-		// Excepted cases -> rejection
-		return;
-	}
 
-	struct TAB_entry
-	{
-		unsigned char TAB1;
-		unsigned char TAB2;
-		unsigned char MASK;
-	
-		constexpr TAB_entry( unsigned char t1, unsigned char t2, unsigned char m )
-			:
-			TAB1 { t1 },
-			TAB2 { t2 },
-			MASK { m  }
-		{}
-	};
-	constexpr std::array<TAB_entry, 15> LUT = // TAB1 , TAB2, MASK
-	{
-		TAB_entry { 255,255,255 },// N/A VALUE
-		TAB_entry { 3,	0,	0b0100 },
-		TAB_entry { 0,	1,	0b0100 },
-		TAB_entry { 3,	1,	0b0010 },
-		TAB_entry { 1,	2,	0b0010 },
-		TAB_entry { 255, 255,255 },
-		TAB_entry { 0,	2,	0b0100 },
-		TAB_entry { 3,	2,	0b1000 },
-		TAB_entry { 2,	3,	0b1000 },
-		TAB_entry { 2,	0,	0b0100 },
-		TAB_entry { 255, 255,255 },
-		TAB_entry { 2,	1,	0b0010 },
-		TAB_entry { 1,	3,	0b0010 },
-		TAB_entry { 1,	0,	0b0100 },
-		TAB_entry { 0,	3,	0b0100 }
-	};
+	const auto                    delta = p2 - p1;
 
-	const auto i = LUT [clip_code].TAB1;
-	const auto j = LUT [clip_code].TAB2;
-
-	if ( ( i == 255 ) || ( j == 255 ) ) return;
-
-	if ( ( code1 != 0 ) && ( code2 != 0 ) )
+	for ( size_t i = 0; i < 4; ++i )
 	{
-		u0 = line.cross( clip_window_edges [i] );
-		u1 = line.cross( clip_window_edges [j] );
-	}
-	else if ( code1 == 0 ) // clip u1
-	{
-		//u1 =	( ( code2 & LUT [clip_code].MASK ) != 0 ) ?
-		//		line.cross( clip_window_edges [i] ) :
-		//		line.cross( clip_window_edges [j] );
-
-		if ( ( code2 & LUT [clip_code].MASK ) != 0 )
+		const auto dot = Dot_Prod( screen_normals [i], delta );
+		if ( dot == 0.0f && Dot_Prod( screen_normals [i], p1 - screen_vertices [i] ) > 0.0f )
 		{
-			u1 = line.cross( clip_window_edges [i] );
+			return;
 		}
-		else
+		const auto t_val = -Dot_Prod( screen_normals [i], p1 - screen_vertices [i] ) / dot;
+		// Impl note: t_val must be between 0 & 1, 
+		// not between t_min & t_max
+		if ( t_val >= 0.0f && t_val <= 1.0f )
 		{
-			u1 = line.cross( clip_window_edges [j] );
-		}
-	}
-	else if ( code2 == 0 ) // clip u0
-	{
-		//u0 =	( ( code1 & LUT [clip_code].MASK ) != 0 ) ?
-		//		line.cross( clip_window_edges [i] ) :
-		//		line.cross( clip_window_edges [j] );
-
-		if ( ( code1 & LUT [clip_code].MASK ) != 0 )
-		{
-			u0 = line.cross( clip_window_edges [i] );
-		}
-		else
-		{
-			u0 = line.cross( clip_window_edges [j] );
+			// Impl note: t_val must be > t_min && < t_max 
+			// in order to clip correctly
+			if ( dot < 0.0f )
+			{
+				// Entering value
+				t_min = ( t_val > t_min ) ? t_val : t_min;
+			}
+			else
+			{
+				// Exiting value
+				t_max = ( t_val < t_max ) ? t_val : t_max;
+			}
 		}
 	}
 
-	Draw_Line( { u0.x / u0.z, u0.y / u0.z }, 
-			   { u1.x / u1.z, u1.y / u1.z }, 
-			   c );
+	if ( t_min > t_max ) return;
+
+	FVec2 v1_ = p1 + delta * t_min; 
+	FVec2 v2_ = p1 + delta * t_max;
+	return Draw_Line( v1_, v2_, c );
 }
 
 void Graphics::Draw_Closed_Polyline( Iter beg, Iter end, Color c )

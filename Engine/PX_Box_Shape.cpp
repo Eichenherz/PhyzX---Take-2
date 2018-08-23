@@ -58,6 +58,7 @@ void PX_Box_Shape::Draw( Graphics& gfx, Color c ) const
 					   vertex +=OBB.center;
 				   } );
 
+	//gfx.Draw_Clipped_Line( vertices [0], vertices [1], c );
 	gfx.Draw_Closed_Polyline( vertices.begin(), vertices.end(), c );
 
 	//Debug
