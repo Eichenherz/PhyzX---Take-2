@@ -77,10 +77,10 @@ void Game::UpdateModel()
 void Game::ComposeFrame()
 {
 	clip_window.Draw_test( gfx, Colors::Red );
-	box.Draw_test( gfx, Colors::Blue );
-	box.Draw( gfx, Colors::White );
+	//box.Draw_test( gfx, Colors::Blue );
+	//box.Draw( gfx, Colors::White );
 	
-	//IVec2 mouse_pos = { 400,50 };
-	//gfx.draw_line_test( FVec2(mouse_pos), { 400.0f,300.0f }, Colors::Blue );
-	//gfx.Draw_Clipped_Line( FVec2(mouse_pos), { 400.0f,300.0f }, Colors::Green );
+	IVec2 mouse_pos = { 195,495 };
+	gfx.draw_line_test( FVec2(mouse_pos), { 400.0f,300.0f }, Colors::Blue );
+	gfx.Draw_Clipped_Line( FVec2(mouse_pos), { 400.0f,300.0f }, Colors::Green );
 }

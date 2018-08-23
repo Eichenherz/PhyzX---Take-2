@@ -387,8 +387,6 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 		return code;
 	};
 	
-	
-
 	const auto code1 = out_code( p1 ); 
 	const auto code2 = out_code( p2 );
 
@@ -458,19 +456,19 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 	constexpr std::array<TAB_entry, 15> LUT = // TAB1 , TAB2, MASK
 	{
 		TAB_entry { 255,255,255 },// N/A VALUE
-		TAB_entry { 0,	3,	0b0100 },
+		TAB_entry { 3,	0,	0b0100 },
 		TAB_entry { 0,	1,	0b0100 },
-		TAB_entry { 1,	3,	0b0100 },
+		TAB_entry { 3,	1,	0b0010 },
 		TAB_entry { 1,	2,	0b0010 },
 		TAB_entry { 255, 255,255 },
 		TAB_entry { 0,	2,	0b0100 },
-		TAB_entry { 2,	3,	0b0110 },
+		TAB_entry { 3,	2,	0b1000 },
 		TAB_entry { 2,	3,	0b1000 },
-		TAB_entry { 0,	2,	0b0001 },
+		TAB_entry { 2,	0,	0b0100 },
 		TAB_entry { 255, 255,255 },
-		TAB_entry { 1,	2,	0b0101 },
+		TAB_entry { 2,	1,	0b0010 },
 		TAB_entry { 1,	3,	0b0010 },
-		TAB_entry { 0,	1,	0b1001 },
+		TAB_entry { 1,	0,	0b0100 },
 		TAB_entry { 0,	3,	0b0100 }
 	};
 
