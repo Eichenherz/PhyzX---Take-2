@@ -20,7 +20,7 @@
  ******************************************************************************************/
 #pragma once
 #include <queue>
-#include "Vec2.h"
+#include "PX_Math.h"
 
 class Mouse
 {
@@ -71,9 +71,9 @@ public:
 		{
 			return type;
 		}
-		IVec2 GetPos() const
+		PX::Vec2 GetPos() const
 		{
-			return{ x,y };
+			return{ float(x),float(y) };
 		}
 		int GetPosX() const
 		{
@@ -96,7 +96,7 @@ public:
 	Mouse() = default;
 	Mouse( const Mouse& ) = delete;
 	Mouse& operator=( const Mouse& ) = delete;
-	IVec2 GetPos() const;
+	PX::Vec2 GetPos() const;
 	int GetPosX() const;
 	int GetPosY() const;
 	bool LeftIsPressed() const;

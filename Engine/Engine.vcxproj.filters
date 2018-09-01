@@ -63,19 +63,16 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vec2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Vec3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\PhyzX - Project\Engine\PX_Math.h">
+    <ClInclude Include="PX_World.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PX_Box_Shape.h">
+    <ClInclude Include="PX_Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PX_Physical_Traits.h">
+    <ClInclude Include="PX_Particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -113,13 +110,10 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\PhyzX - Project\Engine\PX_Math.cpp">
+    <ClCompile Include="PX_Math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PX_Box_Shape.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PX_Physical_Traits.cpp">
+    <ClCompile Include="PX_Particle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -319,7 +319,7 @@ void Graphics::PutPixel( int x,int y,Color c )
 	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
 }
 
-void Graphics::Draw_Line( FVec2 p1, FVec2 p2, Color c )
+void Graphics::Draw_Line( PX::Vec2 p1, PX::Vec2 p2, Color c )
 {
 	const float	slope = (p2.y - p1.y )/ (p2.x - p1.x);
 
@@ -354,7 +354,7 @@ void Graphics::Draw_Line( FVec2 p1, FVec2 p2, Color c )
 	}
 }
 
-void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
+void Graphics::Draw_Clipped_Line( PX::Vec2 p1, PX::Vec2 p2, Color c )
 {
 	constexpr float x_min = 0.0f;//200.0f;
 	constexpr float x_max = float( ScreenWidth - 1 );//600.0f;
@@ -362,7 +362,7 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 	constexpr float y_max = float( ScreenHeight - 1 );//500.0f;
 
 
-	std::function<unsigned char( const FVec2& )> out_code = [&] ( const FVec2& v )
+	std::function<unsigned char( const PX::Vec2& )> out_code = [&] ( const PX::Vec2& v )
 	{
 		// { LEFT/RIGHT/TOP/BOTTOM } bit positioning
 
@@ -407,32 +407,31 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 	float                        t_min = 0.0f;
 	float                        t_max = 1.0f;
 
-	const std::array<FVec2, 4>    screen_normals = {
-		FVec2 {  0.0f,-1.0f },
-		FVec2 {  1.0f, 0.0f },
-		FVec2 {  0.0f, 1.0f },
-		FVec2 { -1.0f, 0.0f }	 
+	const std::array<PX::Vec2, 4>    screen_normals = {
+		PX::Vec2 {  0.0f,-1.0f },
+		PX::Vec2 {  1.0f, 0.0f },
+		PX::Vec2 {  0.0f, 1.0f },
+		PX::Vec2 { -1.0f, 0.0f }	 
 	};
 
-	const std::array<FVec2, 4>    screen_vertices = {
-		FVec2 { x_min, y_min },
-		FVec2 { x_max, y_min },
-		FVec2 { x_max, y_max },
-		FVec2 { x_min, y_max }
+	const std::array<PX::Vec2, 4>    screen_vertices = {
+		PX::Vec2 { x_min, y_min },
+		PX::Vec2 { x_max, y_min },
+		PX::Vec2 { x_max, y_max },
+		PX::Vec2 { x_min, y_max }
 	};
-
 	
 
 	const auto                    delta = p2 - p1;
 
 	for ( size_t i = 0; i < 4; ++i )
 	{
-		const auto dot = Dot_Prod( screen_normals [i], delta );
-		if ( dot == 0.0f && Dot_Prod( screen_normals [i], p1 - screen_vertices [i] ) > 0.0f )
+		const auto dot = screen_normals [i].dot( delta );
+		if ( dot == 0.0f && screen_normals [i].dot( p1 - screen_vertices [i] ) > 0.0f )
 		{
 			return;
 		}
-		const auto t_val = -Dot_Prod( screen_normals [i], p1 - screen_vertices [i] ) / dot;
+		const auto t_val = -screen_normals [i].dot( p1 - screen_vertices [i] ) / dot;
 		// Impl note: t_val must be between 0 & 1, 
 		// not between t_min & t_max
 		if ( t_val >= 0.0f && t_val <= 1.0f )
@@ -454,8 +453,8 @@ void Graphics::Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c )
 
 	if ( t_min > t_max ) return;
 
-	FVec2 v1_ = p1 + delta * t_min; 
-	FVec2 v2_ = p1 + delta * t_max;
+	PX::Vec2 v1_ = p1 + delta * t_min; 
+	PX::Vec2 v2_ = p1 + delta * t_max;
 	return Draw_Line( v1_, v2_, c );
 }
 
@@ -468,7 +467,7 @@ void Graphics::Draw_Closed_Polyline( Iter beg, Iter end, Color c )
 	Draw_Clipped_Line( *std::prev( end ), *beg, c );
 }
 
-void Graphics::draw_line_test( FVec2 p1, FVec2 p2, Color c )
+void Graphics::draw_line_test( PX::Vec2 p1, PX::Vec2 p2, Color c )
 {
 	const float	slope = (p2.y - p1.y) / (p2.x - p1.x);
 	

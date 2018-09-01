@@ -24,11 +24,11 @@
 #include <wrl.h>
 #include "ChiliException.h"
 #include "Colors.h"
-#include "Vec2.h"
+#include "PX_Math.h"
 #include <vector>
 #include <array>
 
-using Iter = std::vector<FVec2>::iterator;
+using Iter = std::vector<PX::Vec2>::iterator;
 
 class Graphics
 {
@@ -64,11 +64,11 @@ public:
 		PutPixel( x, y, { unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
 	}
 	void PutPixel( int x, int y, Color c );
-	void Draw_Line( FVec2 p1, FVec2 p2, Color c );
-	void Draw_Clipped_Line( FVec2 p1, FVec2 p2, Color c );
+	void Draw_Line( PX::Vec2 p1, PX::Vec2 p2, Color c );
+	void Draw_Clipped_Line( PX::Vec2 p1, PX::Vec2 p2, Color c );
 	void Draw_Closed_Polyline( Iter begin, Iter end, Color c );
 
-	void draw_line_test( FVec2 p1, FVec2 p2, Color c );
+	void draw_line_test( PX::Vec2 p1, PX::Vec2 p2, Color c );
 	void draw_polyline_test( Iter begin, Iter end, Color c );
 
 private:

@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <cassert>
-#include "Vec2.h"
 
 
 template<typename T>
@@ -114,8 +113,3 @@ public:
 using FVec3 = Vec3_<float>;
 using IVec3 = Vec3_<int>;
 
-template<typename T>
-Vec3_<T> make_homogenous( const Vec2_<T>& v )
-{
-	return { v.x, v.y, T( 1 ) };
-}

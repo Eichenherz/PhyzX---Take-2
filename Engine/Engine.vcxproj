@@ -137,7 +137,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\PhyzX - Project\Engine\PX_Math.h" />
     <ClInclude Include="ChiliException.h" />
     <ClInclude Include="ChiliWin.h" />
     <ClInclude Include="Colors.h" />
@@ -149,17 +148,16 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Matrix2.h" />
     <ClInclude Include="Mouse.h" />
-    <ClInclude Include="PX_Box_Shape.h" />
-    <ClInclude Include="PX_Physical_Traits.h" />
+    <ClInclude Include="PX_Math.h" />
+    <ClInclude Include="PX_Particle.h" />
+    <ClInclude Include="PX_World.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="Timer.h" />
-    <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec3.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\PhyzX - Project\Engine\PX_Math.cpp" />
     <ClCompile Include="COMInitializer.cpp" />
     <ClCompile Include="DXErr.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -169,8 +167,8 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Matrix2.cpp" />
     <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="PX_Box_Shape.cpp" />
-    <ClCompile Include="PX_Physical_Traits.cpp" />
+    <ClCompile Include="PX_Math.cpp" />
+    <ClCompile Include="PX_Particle.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
