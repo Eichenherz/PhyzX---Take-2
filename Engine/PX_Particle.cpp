@@ -1,5 +1,5 @@
 #include "PX_Particle.h"
-
+#include <cassert>
 using namespace PX;
 
 
@@ -80,5 +80,84 @@ void PX::Particle::Update( Scalar dt )
 	vel += forces * inv_mass * dt;
 	vel *= damp;
 	pos += vel * dt;
+
+	Clear_Forces();
 }
 
+void PX::Particle_Force_Registry::Insert( Particle & p, Particle_Force_Generator * fg )
+{
+	Reg_Entry r { p,fg };
+	reg.emplace_back( std::move(r) );
+}
+
+void PX::Particle_Force_Registry::Erease( Particle & p, Particle_Force_Generator * fg )
+{
+}
+
+void PX::Particle_Force_Registry::Clear()
+{
+	reg.clear();
+}
+
+void PX::Particle_Force_Registry::Update_Forces( Scalar dt )
+{
+	for ( auto& entry : reg )
+	{
+		entry.p_force_gen->Update_Force( entry.p_particle, dt );
+	}
+}
+
+PX::Basic_Spring::Basic_Spring( const Particle& other_end, Scalar spring_coef, Scalar spring_len )
+	:
+	spring_const	{ spring_coef },
+	spring_length	{ spring_len },
+	other			{ other_end }
+{
+	assert( spring_const > Scalar( 0 ) );
+	assert( spring_length > Scalar( 0 ) );
+}
+
+void PX::Basic_Spring::Update_Force( Particle & p, Scalar dt ) const
+{
+	auto force = p.Get_Pos() - other.Get_Pos();
+	const Scalar mag = std::fabs( force.GetLength() - spring_length ) * spring_const;
+
+	force.Normalize();
+	force *= -mag;
+
+	p.Apply_Force( force );
+}
+
+PX::Basic_Bungee::Basic_Bungee( const Particle & other_end, Scalar spring_coef, Scalar spring_len )
+	:
+	Basic_Spring { other_end, spring_coef, spring_len }
+{}
+
+void PX::Basic_Bungee::Update_Force( Particle & p, Scalar dt ) const
+{
+	const auto len = ( p.Get_Pos() - other.Get_Pos() ).GetLengthSq();
+	if ( len <= spring_length * spring_length ) return;
+
+	Basic_Spring::Update_Force( p, dt );
+}
+
+PX::Anchored_Spring::Anchored_Spring( const Vec2 & other_end, Scalar spring_coef, Scalar spring_len )
+	:
+	other			{ other_end },
+	spring_const	{ spring_coef },
+	spring_length	{ spring_len }
+{
+	assert( spring_const > Scalar( 0 ) );
+	assert( spring_length > Scalar( 0 ) );
+}
+
+void PX::Anchored_Spring::Update_Force( Particle & p, Scalar dt ) const
+{
+	auto force = p.Get_Pos() - other;
+	const Scalar mag = std::fabs( force.GetLength() - spring_length ) * spring_const;
+
+	force.Normalize();
+	force *= -mag;
+
+	p.Apply_Force( force );
+}
