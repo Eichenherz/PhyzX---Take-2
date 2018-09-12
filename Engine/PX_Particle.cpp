@@ -1,5 +1,6 @@
 #include "PX_Particle.h"
 #include <cassert>
+#include "Graphics.h"
 using namespace PX;
 
 
@@ -32,6 +33,11 @@ void PX::Particle::Set_Vel( const Vec2 & v )
 void PX::Particle::Apply_Force( const Vec2 & f )
 {
 	forces += f;
+}
+
+void PX::Particle::Apply_Impulse( const Vec2 & p )
+{
+	vel += p * inv_mass;
 }
 
 void PX::Particle::Clear_Forces()
@@ -74,9 +80,28 @@ bool PX::Particle::has_Finite_Mass() const
 	return inv_mass != Scalar(0);
 }
 
+void PX::Particle::Debug_Draw( Graphics & gfx ) const
+{
+	std::vector<Vec2> vertices = {
+		Vec2{ -1.0f,-1.0f },
+		Vec2{  1.0f,-1.0f },
+		Vec2{  1.0f, 1.0f },
+		Vec2{ -1.0f, 1.0f }
+	};
+
+	auto xform = [&] ( Vec2& vertex )
+	{
+		vertex *= 4.0f; // Scale
+		vertex += this->Get_Pos();
+	};
+
+	std::for_each( vertices.begin(), vertices.end(), xform );
+	gfx.Draw_Closed_Polyline( vertices.begin(), vertices.end(), Colors::Red );
+}
+
 void PX::Particle::Update( Scalar dt )
 {
-	vel += Vec2 { 0.0f,-1.0f } *gravity * dt;
+	//vel += Vec2 { 0.0f,-1.0f } *gravity * dt;
 	vel += forces * inv_mass * dt;
 	vel *= damp;
 	pos += vel * dt;

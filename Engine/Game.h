@@ -23,7 +23,9 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
-
+#include "PX_Particle.h"
+#include "Particle_Link.h"
+#include "Timer.h"
 
 class Game
 {
@@ -43,6 +45,10 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-	PX::Radians					angle = 0.0f;
+	Timer			timer;
+
+	PX::Particle	q0;
+	PX::Particle	q1;
+	PX::Rod			rod;
 	/********************************/
 };

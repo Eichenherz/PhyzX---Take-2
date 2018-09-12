@@ -26,6 +26,19 @@ Game::Game( MainWindow& wnd )
 	wnd( wnd ),
 	gfx( wnd )
 {
+	q0.Set_Mass( 2.0f );
+	q1.Set_Mass( 2.0f );
+
+	q0.Set_Pos( PX::Vec2 { 380.0f,300.0f } );
+	q1.Set_Pos( PX::Vec2 { 420.0f,300.0f } );
+
+	q0.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
+	q1.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
+
+	q0.Set_Damp( 0.95f );
+	q1.Set_Damp( 0.95f );
+
+	rod.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
 }
 
 void Game::Go()
@@ -38,9 +51,22 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	
+	const auto dt = timer.Mark();
+
+	const PX::Vec2 mouse_pos = wnd.mouse.GetPos();
+	if ( wnd.mouse.LeftIsPressed() )
+	{
+		const PX::Vec2 p = mouse_pos - q0.Get_Pos();
+		q0.Apply_Impulse( p );
+	}
+
+	rod.SolveVel();
+	q0.Update( dt );
+	q1.Update( dt );
 }
 
 void Game::ComposeFrame()
 {
+	q0.Debug_Draw( gfx );
+	q1.Debug_Draw( gfx );
 }

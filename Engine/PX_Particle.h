@@ -3,6 +3,8 @@
 #include "PX_Math.h"
 #include <vector>
 
+class Graphics;
+
 namespace PX
 {
 	class Particle
@@ -14,6 +16,7 @@ namespace PX
 		void	Set_Pos( const Vec2& p );
 		void	Set_Vel( const Vec2& v );
 		void	Apply_Force( const Vec2& f );
+		void	Apply_Impulse( const Vec2& p );
 		void	Clear_Forces();
 
 		Scalar	Get_Gravity() const;
@@ -24,9 +27,11 @@ namespace PX
 		Vec2	Get_Vel() const;
 		bool	has_Finite_Mass() const;
 
-	private:
+		void	Debug_Draw( Graphics& gfx ) const;
+
+	//private:
 		// World is responsible of updating obj state
-		friend class World;
+		//friend class World;
 
 		void	Update( Scalar dt );
 
@@ -36,7 +41,7 @@ namespace PX
 		Scalar	inv_mass = 0.0f;
 		Scalar	damp;
 
-		Vec2	forces;
+		Vec2	forces = Vec2 { 0.0f,0.0f };
 		Vec2	vel;
 		Vec2	pos;
 	};
