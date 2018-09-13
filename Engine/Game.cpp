@@ -28,18 +28,27 @@ Game::Game( MainWindow& wnd )
 {
 	q0.Set_Mass( 2.0f );
 	q1.Set_Mass( 2.0f );
+	q2.Set_Mass( 2.0f );
 
 	q0.Set_Pos( PX::Vec2 { 380.0f,300.0f } );
 	q1.Set_Pos( PX::Vec2 { 420.0f,300.0f } );
+	q2.Set_Pos( PX::Vec2 { 420.0f,340.0f } );
 
 	q0.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
 	q1.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
+	q2.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
 
 	q0.Set_Damp( 0.95f );
 	q1.Set_Damp( 0.95f );
+	q2.Set_Damp( 0.95f );
 
 	rod.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
 	rod.rod_length = 40.0f;
+	rod1.Init( &q1, &q2, q1.Get_Pos(), q2.Get_Pos() );
+	rod1.rod_length = 40.0f;
+	rod2.Init( &q0, &q2, q0.Get_Pos(), q2.Get_Pos() );
+	const auto len = ( q0.Get_Pos() - q2.Get_Pos() ).GetLength();
+	rod2.rod_length = len;
 }
 
 void Game::Go()
@@ -62,12 +71,16 @@ void Game::UpdateModel()
 	}
 
 	rod.SolveVel();
+	rod1.SolveVel();
+	rod2.SolveVel();
 	q0.Update( dt );
 	q1.Update( dt );
+	q2.Update( dt );
 }
 
 void Game::ComposeFrame()
 {
 	q0.Debug_Draw( gfx );
 	q1.Debug_Draw( gfx );
+	q2.Debug_Draw( gfx );
 }

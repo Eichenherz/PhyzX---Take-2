@@ -50,7 +50,6 @@ void PX::Rod::SolveVel()
 	p_A->Apply_Impulse( -P );
 	p_B->Apply_Impulse( P );
 
-
 	// Apply position correction;
 	const Scalar	pos_err = len - rod_length;
 	const Vec2		err_P = -dir * pos_err * eff_mass;
