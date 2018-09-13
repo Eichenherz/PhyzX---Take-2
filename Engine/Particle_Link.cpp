@@ -26,6 +26,9 @@ void PX::Rod::SolveVel()
 	const Vec2 pos_B = p_B->Get_Pos();
 	Vec2 dir = pos_B - pos_A;
 
+	// For pos correction
+	const auto len = dir.GetLength();
+	/*******************/
 
 	dir.Normalize();
 	Vec2 vel_A = p_A->Get_Vel();
@@ -46,6 +49,14 @@ void PX::Rod::SolveVel()
 	acc_impulse += P;
 	p_A->Apply_Impulse( -P );
 	p_B->Apply_Impulse( P );
+
+
+	// Apply position correction;
+	const Scalar	pos_err = len - rod_length;
+	const Vec2		err_P = -dir * pos_err * eff_mass;
+
+	p_A->Set_Pos( pos_A - err_P * inv_mass_A );
+	p_B->Set_Pos( pos_B + err_P * inv_mass_B );
 }
 
 void PX::Rod::SolvePos()

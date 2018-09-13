@@ -39,6 +39,7 @@ Game::Game( MainWindow& wnd )
 	q1.Set_Damp( 0.95f );
 
 	rod.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
+	rod.rod_length = 40.0f;
 }
 
 void Game::Go()
