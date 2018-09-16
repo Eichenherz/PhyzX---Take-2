@@ -42,13 +42,16 @@ Game::Game( MainWindow& wnd )
 	q1.Set_Damp( 0.95f );
 	q2.Set_Damp( 0.95f );
 
-	rod.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
-	rod.rod_length = 40.0f;
+	//rod.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
+	//rod.rod_length = 40.0f;
 	rod1.Init( &q1, &q2, q1.Get_Pos(), q2.Get_Pos() );
 	rod1.rod_length = 40.0f;
 	rod2.Init( &q0, &q2, q0.Get_Pos(), q2.Get_Pos() );
 	const auto len = ( q0.Get_Pos() - q2.Get_Pos() ).GetLength();
 	rod2.rod_length = len;
+
+	cable.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
+	cable.cable_length = 40.0f;
 }
 
 void Game::Go()
@@ -70,9 +73,10 @@ void Game::UpdateModel()
 		q0.Apply_Impulse( p );
 	}
 
-	rod.SolveVel();
-	rod1.SolveVel();
-	rod2.SolveVel();
+	//rod.Solve();
+	rod1.Solve();
+	rod2.Solve();
+	cable.Solve();
 	q0.Update( dt );
 	q1.Update( dt );
 	q2.Update( dt );

@@ -53,5 +53,6 @@ private:
 	PX::Rod			rod;
 	PX::Rod			rod1;
 	PX::Rod			rod2;
+	PX::Cable		cable;
 	/********************************/
 };

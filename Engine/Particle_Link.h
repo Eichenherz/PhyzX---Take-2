@@ -11,8 +11,7 @@ namespace PX
 	public:
 						Link();
 		void			Init( Particle* a, Particle* b, const Vec2& anchorA, const Vec2& anchorB );
-		virtual void	SolveVel() = 0;
-		virtual void	SolvePos() = 0;
+		virtual void	Solve() = 0;
 
 	public: // Will be made private in the future.
 		Particle*	p_A;
@@ -28,10 +27,28 @@ namespace PX
 	struct Rod : public Link
 	{
 	public:
-		void SolveVel() override;
-		void SolvePos() override;
+		void Solve() override;
 
 	public:
-		float rod_length; // anchorA-anchorB.Length
+		float rod_length;
+	};
+
+	struct Cable : public Link
+	{
+	public:
+		void Solve() override;
+
+	public:
+		float cable_length;
+	};
+
+	struct Spring : public Link
+	{
+	public:
+		void Solve() override;
+
+	public:
+		float rest_length;
+		// bunch of other stuff
 	};
 }
