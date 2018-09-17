@@ -22,6 +22,8 @@ void PX::Particle::Set_Damp( Scalar d )
 
 void PX::Particle::Set_Pos( const Vec2 & p )
 {
+	if ( static_particle ) return;
+
 	pos = p;
 }
 
@@ -37,6 +39,8 @@ void PX::Particle::Apply_Force( const Vec2 & f )
 
 void PX::Particle::Apply_Impulse( const Vec2 & p )
 {
+	if ( static_particle ) return;
+
 	vel += p * inv_mass;
 }
 
@@ -101,6 +105,9 @@ void PX::Particle::Debug_Draw( Graphics & gfx ) const
 
 void PX::Particle::Update( Scalar dt )
 {
+	if ( static_particle ) return;
+
+
 	//vel += Vec2 { 0.0f,-1.0f } *gravity * dt;
 	vel += forces * inv_mass * dt;
 	vel *= damp;

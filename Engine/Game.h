@@ -54,5 +54,6 @@ private:
 	PX::Rod			rod1;
 	PX::Rod			rod2;
 	PX::Cable		cable;
+	PX::Spring		spring;
 	/********************************/
 };

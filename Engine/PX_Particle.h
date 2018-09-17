@@ -34,7 +34,7 @@ namespace PX
 		//friend class World;
 
 		void	Update( Scalar dt );
-
+		bool static_particle = false;
 	private:
 		Scalar	gravity = 10.0f;
 		Scalar	mass;

@@ -17,11 +17,8 @@ namespace PX
 		Particle*	p_A;
 		Particle*	p_B;
 		Vec2		acc_impulse;
-		Vec2		bias;
 		Vec2		loc_anchor_A;
 		Vec2		loc_anchor_B;
-		float		bias_factor;
-		float		softness;
 	};
 
 	struct Rod : public Link
@@ -46,9 +43,12 @@ namespace PX
 	{
 	public:
 		void Solve() override;
-
+		void Set_Timestep( float _dt ); 
+		void Clear_P();
 	public:
 		float rest_length;
-		// bunch of other stuff
+		float freq; // in Hz // can't be zero;
+		float damping_ratio;
+		float dt; 
 	};
 }
