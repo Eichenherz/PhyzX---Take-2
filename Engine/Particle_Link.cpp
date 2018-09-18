@@ -1,6 +1,11 @@
 #include "Particle_Link.h"
 #include "PX_Particle.h"
 #include <cassert>
+#include "ChiliWin.h"
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 
 PX::Link::Link()
 	:
@@ -108,7 +113,6 @@ void PX::Spring::Solve()
 {
 	assert( this->freq > 0.0f );
 
-
 	Vec2 dir = p_B->Get_Pos() - p_A->Get_Pos();
 
 	const Scalar inv_mass = p_A->Get_Inv_Mass() + p_B->Get_Inv_Mass();
@@ -123,23 +127,50 @@ void PX::Spring::Solve()
 	const Scalar damp_coef = Scalar( 2 ) * damping_ratio * eff_mass * omega;
 	const Scalar spring_coef = eff_mass * omega * omega;
 
-	Scalar	gamma =  dt * ( damp_coef + dt * spring_coef );
-			gamma = ( gamma != Scalar( 0 ) ) ? Scalar(1)/gamma : Scalar( 0 );
+	Scalar	gamma =  dt * ( damp_coef + dt * spring_coef ); 
+	gamma = ( gamma != Scalar( 0 ) ) ? Scalar( 1 ) / gamma : Scalar( 0 );
 	const Scalar beta = pos_err * dt * spring_coef * gamma;
+	
+	//Scalar beta = 0.001f;
 	/********************************/
-
+	
 	dir.Normalize();
 
 	const Vec2 vel_A = p_A->Get_Vel();
 	const Vec2 vel_B = p_B->Get_Vel();
 
 	const Scalar jv = dir.dot( vel_B - vel_A );
-	const Scalar lagrange_mul = -eff_mass * ( jv + beta + gamma * acc_impulse.GetLength() );
+	const Scalar lagrange_mul = -eff_mass * ( beta + jv + gamma * acc_impulse.GetLength() );
 	const Vec2 P = dir * lagrange_mul;
 
 	acc_impulse += P;
 	p_A->Apply_Impulse( -P );
 	p_B->Apply_Impulse( P );
+
+
+
+	std::wstring debug_data;
+	std::wostringstream oss( debug_data );
+	oss << L"Gamma" << gamma << L"\n";
+	oss << L"Beta" << beta << L"\n";
+	oss << L"Jv" << jv << L"\n";
+	oss << L"lambda" << lagrange_mul << L"\n";
+	debug_data = std::move( oss.str() );
+
+
+	std::for_each( std::istream_iterator<std::wstring, wchar_t>(std::wistringstream(debug_data)),
+				   std::istream_iterator<std::wstring, wchar_t>( ),
+				   [] ( const std::wstring& s )
+				   {
+					   OutputDebugString( s.c_str() );
+					   OutputDebugString( L"\n" );
+				   } );
+
+
+	// Possible fixes
+	/*
+	// clamp impulse
+	*/
 }
 
 void PX::Spring::Set_Timestep( float _dt )

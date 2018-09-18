@@ -54,7 +54,7 @@ Game::Game( MainWindow& wnd )
 	//cable.cable_length = 40.0f;
 
 	spring.freq = 60.0f;
-	spring.damping_ratio = 0.0f;
+	spring.damping_ratio = 0.025f;
 	spring.rest_length = 40.0f;
 
 	spring.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
