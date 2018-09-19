@@ -25,9 +25,11 @@ namespace PX
 	{
 	public:
 		void Solve() override;
+		void Set_Timestep( float _dt);
 
 	public:
 		float rod_length;
+		float dt;
 	};
 
 	struct Cable : public Link
@@ -44,7 +46,7 @@ namespace PX
 	public:
 		void Solve() override;
 		void Set_Timestep( float _dt ); 
-		void Clear_P();
+		
 	public:
 		float rest_length;
 		float freq; // in Hz // can't be zero;

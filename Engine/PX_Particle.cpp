@@ -116,6 +116,21 @@ void PX::Particle::Update( Scalar dt )
 	Clear_Forces();
 }
 
+void PX::Particle::UpdateVel( Scalar dt )
+{
+	if ( static_particle ) return;
+
+	vel += forces * inv_mass * dt;
+	vel *= damp;
+
+	Clear_Forces();
+}
+
+void PX::Particle::UpdatePos( Scalar dt )
+{
+	pos += vel * dt;
+}
+
 void PX::Particle_Force_Registry::Insert( Particle & p, Particle_Force_Generator * fg )
 {
 	Reg_Entry r { p,fg };

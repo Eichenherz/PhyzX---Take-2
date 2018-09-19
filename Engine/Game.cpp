@@ -42,8 +42,8 @@ Game::Game( MainWindow& wnd )
 	q1.Set_Damp( 0.95f );
 	q2.Set_Damp( 0.95f );
 
-	//rod.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
-	//rod.rod_length = 40.0f;
+	rod.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
+	rod.rod_length = 40.0f;
 	//rod1.Init( &q1, &q2, q1.Get_Pos(), q2.Get_Pos() );
 	//rod1.rod_length = 40.0f;
 	//rod2.Init( &q0, &q2, q0.Get_Pos(), q2.Get_Pos() );
@@ -79,16 +79,18 @@ void Game::UpdateModel()
 		const PX::Vec2 p = mouse_pos - q0.Get_Pos();
 		q0.Apply_Impulse( p );
 	}
+	
 
-	//rod.Solve();
+	rod.Set_Timestep( dt );
+	rod.Solve();
 	//rod1.Solve();
 	//rod2.Solve();
 	//cable.Solve();
-	spring.Set_Timestep( dt );
-	spring.Solve();
+	//spring.Set_Timestep( dt );
+	//spring.Solve();
+	
 	q0.Update( dt );
 	q1.Update( dt );
-	//q2.Update( dt );
 }
 
 void Game::ComposeFrame()

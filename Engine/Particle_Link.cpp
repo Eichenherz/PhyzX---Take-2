@@ -31,10 +31,8 @@ void PX::Rod::Solve()
 	Vec2 dir = pos_B - pos_A;
 
 	// For pos correction
-	const auto len = dir.GetLength();
+	 const auto len = dir.GetLength();
 	/*******************/
-
-	dir.Normalize();
 
 	const Scalar inv_mass_A = p_A->Get_Inv_Mass();
 	const Scalar inv_mass_B = p_B->Get_Inv_Mass();
@@ -54,16 +52,40 @@ void PX::Rod::Solve()
 	acc_impulse += P;
 	p_A->Apply_Impulse( -P );
 	p_B->Apply_Impulse( P );
+	
 
 	// Apply position correction;
 	const Scalar pos_err = len - rod_length;
 	const Vec2	err_P = -dir * pos_err * eff_mass;
-
+													  
 	const Vec2 new_pos_A = pos_A - err_P * inv_mass_A;
 	const Vec2 new_pos_B = pos_B + err_P * inv_mass_B;
-
+													 
 	p_A->Set_Pos( new_pos_A );
 	p_B->Set_Pos( new_pos_B );
+
+
+	std::wstring debug_data;
+	std::wostringstream oss( debug_data );
+	//oss << L"Pos" << gamma << L"\n";
+	//oss << L"Vel" << beta << L"\n";
+	oss << L"Jv" << jv << L"\n";
+	oss << L"lambda" << lagrange_mul << L"\n";
+	debug_data = std::move( oss.str() );
+
+
+	std::for_each( std::istream_iterator<std::wstring, wchar_t>( std::wistringstream( debug_data ) ),
+				   std::istream_iterator<std::wstring, wchar_t>(),
+				   [] ( const std::wstring& s )
+				   {
+					   OutputDebugString( s.c_str() );
+					   OutputDebugString( L"\n" );
+				   } );
+}
+
+void PX::Rod::Set_Timestep( float _dt )
+{
+	dt = _dt;
 }
 
 void PX::Cable::Solve()
@@ -117,23 +139,23 @@ void PX::Spring::Solve()
 
 	const Scalar inv_mass = p_A->Get_Inv_Mass() + p_B->Get_Inv_Mass();
 	const Scalar eff_mass = ( inv_mass != Scalar( 0 ) ) ?
-							Scalar( 1 ) / inv_mass :
-							Scalar( 0 );
+		Scalar( 1 ) / inv_mass :
+		Scalar( 0 );
 
-	// Compute soft constraint params
+// Compute soft constraint params
 	const Scalar pos_err = dir.GetLength() - rest_length;
 
 	const Scalar omega = CONSTANTS::TWO_PI * freq;
 	const Scalar damp_coef = Scalar( 2 ) * damping_ratio * eff_mass * omega;
 	const Scalar spring_coef = eff_mass * omega * omega;
 
-	Scalar	gamma =  dt * ( damp_coef + dt * spring_coef ); 
+	Scalar	gamma = dt * ( damp_coef + dt * spring_coef );
 	gamma = ( gamma != Scalar( 0 ) ) ? Scalar( 1 ) / gamma : Scalar( 0 );
 	const Scalar beta = pos_err * dt * spring_coef * gamma;
-	
+
 	//Scalar beta = 0.001f;
 	/********************************/
-	
+
 	dir.Normalize();
 
 	const Vec2 vel_A = p_A->Get_Vel();
@@ -158,28 +180,16 @@ void PX::Spring::Solve()
 	debug_data = std::move( oss.str() );
 
 
-	std::for_each( std::istream_iterator<std::wstring, wchar_t>(std::wistringstream(debug_data)),
-				   std::istream_iterator<std::wstring, wchar_t>( ),
+	std::for_each( std::istream_iterator<std::wstring, wchar_t>( std::wistringstream( debug_data ) ),
+				   std::istream_iterator<std::wstring, wchar_t>(),
 				   [] ( const std::wstring& s )
 				   {
 					   OutputDebugString( s.c_str() );
 					   OutputDebugString( L"\n" );
 				   } );
-
-
-	// Possible fixes
-	/*
-	// clamp impulse
-	*/
 }
 
 void PX::Spring::Set_Timestep( float _dt )
 {
 	dt = _dt;
 }
-
-void PX::Spring::Clear_P()
-{
-	acc_impulse = Vec2 { 0.0f,0.0f };
-}
-// 
