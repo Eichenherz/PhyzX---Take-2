@@ -6,7 +6,7 @@ PX::Link::Link()
 	:
 	p_A			{ nullptr },
 	p_B			{ nullptr },
-	acc_impulse { 0.0f,0.0f }
+	impulse		{ 0.0f }
 
 {}
 
@@ -46,7 +46,7 @@ void PX::Rod::Solve()
 	const Scalar lagrange_mul = -eff_mass * ( jv );
 	const Vec2 P = dir * lagrange_mul;
 
-	acc_impulse += P;
+	impulse += lagrange_mul;
 	p_A->Apply_Impulse( -P );
 	p_B->Apply_Impulse( P );
 
@@ -90,7 +90,7 @@ void PX::Cable::Solve()
 	const Scalar lagrange_mul = -eff_mass * ( jv );
 	const Vec2 P = dir * lagrange_mul;
 
-	acc_impulse += P;
+	impulse += lagrange_mul;
 	p_A->Apply_Impulse( -P );
 	p_B->Apply_Impulse( P );
 
@@ -106,49 +106,49 @@ void PX::Cable::Solve()
 
 void PX::Spring::Solve()
 {
-	assert( this->freq > 0.0f );
+	Scalar inv_mass = p_A->Get_Inv_Mass() + p_B->Get_Inv_Mass();
+	Scalar eff_mass = Scalar( 1 ) / inv_mass;
+	
+	Vec2 dir = p_B->Get_Pos() - p_A->Get_Pos();	
+
+	// Debug
+	C = dir.GetLength();
 
 
-	Vec2 dir = p_B->Get_Pos() - p_A->Get_Pos();
-
-	const Scalar inv_mass = p_A->Get_Inv_Mass() + p_B->Get_Inv_Mass();
-	const Scalar eff_mass = ( inv_mass != Scalar( 0 ) ) ?
-							Scalar( 1 ) / inv_mass :
-							Scalar( 0 );
-
-	// Compute soft constraint params
 	const Scalar pos_err = dir.GetLength() - rest_length;
 
+	// Compute soft constraint params
 	const Scalar omega = CONSTANTS::TWO_PI * freq;
 	const Scalar damp_coef = Scalar( 2 ) * damping_ratio * eff_mass * omega;
 	const Scalar spring_coef = eff_mass * omega * omega;
 
-	Scalar	gamma =  dt * ( damp_coef + dt * spring_coef );
-			gamma = ( gamma != Scalar( 0 ) ) ? Scalar(1)/gamma : Scalar( 0 );
+	const Scalar gamma = Scalar( 1 ) / ( dt * ( damp_coef + dt * spring_coef ) );
 	const Scalar beta = pos_err * dt * spring_coef * gamma;
+	
+	inv_mass += gamma;
+	eff_mass = Scalar( 1 ) / inv_mass;
 	/********************************/
 
 	dir.Normalize();
 
-	const Vec2 vel_A = p_A->Get_Vel();
-	const Vec2 vel_B = p_B->Get_Vel();
-
-	const Scalar jv = dir.dot( vel_B - vel_A );
-	const Scalar lagrange_mul = -eff_mass * ( jv + beta + gamma * acc_impulse.GetLength() );
+	const Scalar jv = dir.dot( p_B->Get_Vel() - p_A->Get_Vel() );
+	const Scalar lagrange_mul = -eff_mass * ( jv + beta + gamma * impulse );
 	const Vec2 P = dir * lagrange_mul;
 
-	acc_impulse += P;
+	impulse += lagrange_mul;
 	p_A->Apply_Impulse( -P );
 	p_B->Apply_Impulse( P );
+
+	// No ? pos correction for springs
+	const Vec2 err_P = -dir * ( pos_err * eff_mass );
+	const Vec2 new_pos_A = p_A->Get_Pos() - err_P * p_A->Get_Inv_Mass();
+	const Vec2 new_pos_B = p_B->Get_Pos() + err_P * p_B->Get_Inv_Mass();
+
+	p_A->Set_Pos( new_pos_A );
+	p_B->Set_Pos( new_pos_B );
 }
 
 void PX::Spring::Set_Timestep( float _dt )
 {
 	dt = _dt;
 }
-
-void PX::Spring::Clear_P()
-{
-	acc_impulse = Vec2 { 0.0f,0.0f };
-}
-// 

@@ -16,7 +16,7 @@ namespace PX
 	public: // Will be made private in the future.
 		Particle*	p_A;
 		Particle*	p_B;
-		Vec2		acc_impulse;
+		Scalar		impulse;
 		Vec2		loc_anchor_A;
 		Vec2		loc_anchor_B;
 	};
@@ -44,11 +44,13 @@ namespace PX
 	public:
 		void Solve() override;
 		void Set_Timestep( float _dt ); 
-		void Clear_P();
+
 	public:
 		float rest_length;
-		float freq; // in Hz // can't be zero;
+		float freq; 
 		float damping_ratio;
 		float dt; 
+		float C;
+		Vec2 err;
 	};
 }

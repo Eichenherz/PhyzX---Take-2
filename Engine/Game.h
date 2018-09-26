@@ -50,10 +50,9 @@ private:
 	PX::Particle	q0;
 	PX::Particle	q1;
 	PX::Particle	q2;
-	PX::Rod			rod;
-	PX::Rod			rod1;
-	PX::Rod			rod2;
-	PX::Cable		cable;
+	
 	PX::Spring		spring;
+	PX::Spring		spring1;
+	PX::Spring		spring2;
 	/********************************/
 };
