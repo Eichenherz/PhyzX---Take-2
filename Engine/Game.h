@@ -55,5 +55,6 @@ private:
 	PX::Rod			rod2;
 	PX::Cable		cable;
 	PX::Spring		spring;
+	PX::XPBD_Link	XPDB;
 	/********************************/
 };

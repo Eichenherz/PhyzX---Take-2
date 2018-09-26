@@ -10,7 +10,7 @@ namespace PX
 	{
 	public:
 						Link();
-		void			Init( Particle* a, Particle* b, const Vec2& anchorA, const Vec2& anchorB );
+		void			Init( Particle* a, Particle* b, const Vec2& anchor );
 		virtual void	Solve() = 0;
 
 	public: // Will be made private in the future.
@@ -25,11 +25,9 @@ namespace PX
 	{
 	public:
 		void Solve() override;
-		void Set_Timestep( float _dt);
 
 	public:
 		float rod_length;
-		float dt;
 	};
 
 	struct Cable : public Link
@@ -52,5 +50,17 @@ namespace PX
 		float freq; // in Hz // can't be zero;
 		float damping_ratio;
 		float dt; 
+	};
+
+	struct XPBD_Link : public Link
+	{
+		void Solve();
+		void Set_Timestep( float _dt );
+	public:
+		float	dt;
+		float	rest_length;
+		float	freq;
+		Vec2	last_pos = { 0.0f,0.0f };
+		Scalar	lambda = 0.0f;
 	};
 }

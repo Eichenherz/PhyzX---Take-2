@@ -20,14 +20,16 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include <numeric>
 
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd )
 {
+	const auto static_mass = std::numeric_limits<float>::infinity();
 	q0.Set_Mass( 2.0f );
-	q1.Set_Mass( 2.0f );
+	q1.Set_Mass( static_mass );
 	q2.Set_Mass( 2.0f );
 
 	q0.Set_Pos( PX::Vec2 { 420.0f,320.0f } );
@@ -39,25 +41,12 @@ Game::Game( MainWindow& wnd )
 	q2.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
 
 	q0.Set_Damp( 0.95f );
-	q1.Set_Damp( 0.95f );
-	q2.Set_Damp( 0.95f );
 
-	rod.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
-	rod.rod_length = 40.0f;
-	//rod1.Init( &q1, &q2, q1.Get_Pos(), q2.Get_Pos() );
-	//rod1.rod_length = 40.0f;
-	//rod2.Init( &q0, &q2, q0.Get_Pos(), q2.Get_Pos() );
-	//const auto len = ( q0.Get_Pos() - q2.Get_Pos() ).GetLength();
-	//rod2.rod_length = len;
+	spring.freq = 4.0f;
+	spring.damping_ratio = 0.7f;
+	spring.rest_length = 50.0f;
+	spring.Init( &q0, &q1, q1.Get_Pos() );
 
-	//cable.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
-	//cable.cable_length = 40.0f;
-
-	spring.freq = 60.0f;
-	spring.damping_ratio = 0.025f;
-	spring.rest_length = 40.0f;
-
-	spring.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
 	q1.static_particle = true;
 }
 
@@ -77,17 +66,18 @@ void Game::UpdateModel()
 	if ( wnd.mouse.LeftIsPressed() )
 	{
 		const PX::Vec2 p = mouse_pos - q0.Get_Pos();
-		q0.Apply_Impulse( p );
+		q0.Apply_Impulse( p * 0.5f );
+	}
+	if ( wnd.mouse.RightIsPressed() )
+	{
+		q0.Clear_Forces();
 	}
 	
-
-	rod.Set_Timestep( dt );
-	rod.Solve();
-	//rod1.Solve();
-	//rod2.Solve();
-	//cable.Solve();
-	//spring.Set_Timestep( dt );
-	//spring.Solve();
+	spring.Set_Timestep( dt );
+	for ( auto i = 0; i < 20; ++i )
+	{
+		spring.Solve();
+	}
 	
 	q0.Update( dt );
 	q1.Update( dt );

@@ -107,13 +107,18 @@ void PX::Particle::Update( Scalar dt )
 {
 	if ( static_particle ) return;
 
-
-	//vel += Vec2 { 0.0f,-1.0f } *gravity * dt;
 	vel += forces * inv_mass * dt;
-	vel *= damp;
 	pos += vel * dt;
+	vel *= damp;
 
-	Clear_Forces();
+
+	//// Predict pos.
+	//const auto old_pos = pos;
+	//pos += vel * dt + forces * inv_mass * dt * dt * 0.5f; 
+	//vel = ( pos - old_pos ) / dt;
+	//vel *= damp;
+
+	//Clear_Forces();
 }
 
 void PX::Particle::UpdateVel( Scalar dt )
