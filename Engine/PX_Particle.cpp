@@ -86,16 +86,19 @@ bool PX::Particle::has_Finite_Mass() const
 
 void PX::Particle::Debug_Draw( Graphics & gfx ) const
 {
-	std::vector<Vec2> vertices = {
-		Vec2{ -1.0f,-1.0f },
-		Vec2{  1.0f,-1.0f },
-		Vec2{  1.0f, 1.0f },
-		Vec2{ -1.0f, 1.0f }
-	};
+	constexpr float		radius = 20.0f;
+	constexpr size_t	precision = 13; // do not change !!!
+	constexpr float		step = CONSTANTS::PI / 6.0f;
+	std::vector<Vec2>	vertices( precision );
+
+	for ( size_t i = 0; i < precision; ++i )
+	{
+		const Vec2 vertex = Vec2 { std::cos( float( i ) * step ), std::sin( float( i ) * step ) } *radius;
+		vertices [i] = std::move( vertex );
+	}
 
 	auto xform = [&] ( Vec2& vertex )
 	{
-		vertex *= 4.0f; // Scale
 		vertex += this->Get_Pos();
 	};
 
@@ -107,8 +110,6 @@ void PX::Particle::Update( Scalar dt )
 {
 	if ( static_particle ) return;
 
-
-	//vel += Vec2 { 0.0f,-1.0f } *gravity * dt;
 	vel += forces * inv_mass * dt;
 	vel *= damp;
 	pos += vel * dt;

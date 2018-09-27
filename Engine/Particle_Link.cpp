@@ -129,7 +129,14 @@ void PX::Spring::Solve()
 	eff_mass = Scalar( 1 ) / inv_mass;
 	/********************************/
 
+	
 	dir.Normalize();
+	// Warm starting
+	const Vec2 warm_P = dir * impulse;
+	p_A->Apply_Impulse( -warm_P );
+	p_B->Apply_Impulse(  warm_P );
+	/********************************/
+	
 
 	const Scalar jv = dir.dot( p_B->Get_Vel() - p_A->Get_Vel() );
 	const Scalar lagrange_mul = -eff_mass * ( jv + beta + gamma * impulse );
@@ -137,15 +144,9 @@ void PX::Spring::Solve()
 
 	impulse += lagrange_mul;
 	p_A->Apply_Impulse( -P );
-	p_B->Apply_Impulse( P );
+	p_B->Apply_Impulse(  P );
 
-	// No ? pos correction for springs
-	const Vec2 err_P = -dir * ( pos_err * eff_mass );
-	const Vec2 new_pos_A = p_A->Get_Pos() - err_P * p_A->Get_Inv_Mass();
-	const Vec2 new_pos_B = p_B->Get_Pos() + err_P * p_B->Get_Inv_Mass();
-
-	p_A->Set_Pos( new_pos_A );
-	p_B->Set_Pos( new_pos_B );
+	//// No pos correction for springs
 }
 
 void PX::Spring::Set_Timestep( float _dt )

@@ -31,8 +31,8 @@ Game::Game( MainWindow& wnd )
 {
 	const auto inf = std::numeric_limits<float>::infinity();
 	q0.Set_Mass( 1.0f );
-	q1.Set_Mass( 2.0f );
-	q2.Set_Mass( 3.0f );
+	q1.Set_Mass( 5.0f );
+	q2.Set_Mass( 7.0f );
 
 	q0.Set_Pos( PX::Vec2 { 420.0f,320.0f } );
 	q1.Set_Pos( PX::Vec2 { 400.0f,280.0f } );
@@ -48,17 +48,17 @@ Game::Game( MainWindow& wnd )
 
 	spring.freq = 3.0f;
 	spring.damping_ratio = 0.1f;
-	spring.rest_length = 0.01f;
+	spring.rest_length = 50.0f;
 
 	spring1.freq = 3.0f;
 	spring1.damping_ratio = 0.1f;
-	spring1.rest_length = 0.01f;
+	spring1.rest_length = 50.0f;
 
 	spring2.freq = 3.0f;
 	spring2.damping_ratio = 0.1f;
 
 	const auto len = ( q1.Get_Pos() - q0.Get_Pos() ).GetLength();
-	spring2.rest_length = 0.01f;
+	spring2.rest_length = len;
 
 	spring.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
 	spring1.Init( &q0, &q2, q0.Get_Pos(), q2.Get_Pos() );
@@ -89,7 +89,7 @@ void Game::UpdateModel()
 	spring.Set_Timestep( dt );
 	spring1.Set_Timestep( dt );
 	spring2.Set_Timestep( dt );
-	for ( size_t i = 0; i < 20; ++i )
+	for ( size_t i = 0; i < 2; ++i )
 	{
 		spring.Solve();
 		spring1.Solve();
