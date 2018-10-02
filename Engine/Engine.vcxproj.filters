@@ -78,6 +78,9 @@
     <ClInclude Include="Particle_Link.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PX_Collision.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXErr.cpp">
@@ -120,6 +123,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Particle_Link.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PX_Collision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

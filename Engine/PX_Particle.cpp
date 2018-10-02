@@ -4,9 +4,10 @@
 using namespace PX;
 
 
-void PX::Particle::Set_Gravity( Scalar g )
+void PX::Particle::Set_Restitution( Scalar e )
 {
-	gravity = g;
+	if ( !has_Finite_Mass() ) return;
+	restitution = e;
 }
 
 void PX::Particle::Set_Mass( Scalar m )
@@ -22,7 +23,7 @@ void PX::Particle::Set_Damp( Scalar d )
 
 void PX::Particle::Set_Pos( const Vec2 & p )
 {
-	if ( static_particle ) return;
+	if ( !has_Finite_Mass() ) return;
 
 	pos = p;
 }
@@ -39,8 +40,6 @@ void PX::Particle::Apply_Force( const Vec2 & f )
 
 void PX::Particle::Apply_Impulse( const Vec2 & p )
 {
-	if ( static_particle ) return;
-
 	vel += p * inv_mass;
 }
 
@@ -49,9 +48,9 @@ void PX::Particle::Clear_Forces()
 	forces = Vec2 { 0.0f,0.0f };
 }
 
-Scalar PX::Particle::Get_Gravity() const
+Scalar PX::Particle::Get_Restitution() const
 {
-	return gravity;
+	return restitution;
 }
 
 Scalar PX::Particle::Get_Mass() const
@@ -86,7 +85,7 @@ bool PX::Particle::has_Finite_Mass() const
 
 void PX::Particle::Debug_Draw( Graphics & gfx ) const
 {
-	constexpr float		radius = 20.0f;
+	constexpr float		radius = 4.0f;
 	constexpr size_t	precision = 13; // do not change !!!
 	constexpr float		step = CONSTANTS::PI / 6.0f;
 	std::vector<Vec2>	vertices( precision );
@@ -103,12 +102,12 @@ void PX::Particle::Debug_Draw( Graphics & gfx ) const
 	};
 
 	std::for_each( vertices.begin(), vertices.end(), xform );
-	gfx.Draw_Closed_Polyline( vertices.begin(), vertices.end(), Colors::Red );
+	gfx.Draw_Closed_Polyline( vertices.begin(), vertices.end(), c );
 }
 
 void PX::Particle::Update( Scalar dt )
 {
-	if ( static_particle ) return;
+	if ( !has_Finite_Mass() ) return;
 
 	vel += forces * inv_mass * dt;
 	vel *= damp;

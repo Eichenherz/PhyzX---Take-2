@@ -26,6 +26,7 @@
 #include "PX_Particle.h"
 #include "Particle_Link.h"
 #include "Timer.h"
+#include "PX_Collision.h"
 
 class Game
 {
@@ -45,14 +46,14 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
+	const float h = 0.0125f;
 	Timer			timer;
 
 	PX::Particle	q0;
 	PX::Particle	q1;
 	PX::Particle	q2;
 	
-	PX::Spring		spring;
-	PX::Spring		spring1;
-	PX::Spring		spring2;
+	PX::Rod		rod;
+	PX::Rod		rod1;
 	/********************************/
 };

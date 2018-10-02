@@ -10,13 +10,10 @@ PX::Link::Link()
 
 {}
 
-void PX::Link::Init( Particle* a, Particle* b, const Vec2& anchorA, const Vec2& anchorB )
+void PX::Link::Init( Particle* a, Particle* b )
 {
 	p_A = a;
 	p_B = b;
-
-	loc_anchor_A = anchorA - p_A->Get_Pos();
-	loc_anchor_B = anchorB - p_B->Get_Pos();
 }
 
 void PX::Rod::Solve()
@@ -110,10 +107,6 @@ void PX::Spring::Solve()
 	Scalar eff_mass = Scalar( 1 ) / inv_mass;
 	
 	Vec2 dir = p_B->Get_Pos() - p_A->Get_Pos();	
-
-	// Debug
-	C = dir.GetLength();
-
 
 	const Scalar pos_err = dir.GetLength() - rest_length;
 

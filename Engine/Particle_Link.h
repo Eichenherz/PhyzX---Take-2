@@ -10,15 +10,13 @@ namespace PX
 	{
 	public:
 						Link();
-		void			Init( Particle* a, Particle* b, const Vec2& anchorA, const Vec2& anchorB );
+		void			Init( Particle* a, Particle* b );
 		virtual void	Solve() = 0;
 
 	public: // Will be made private in the future.
 		Particle*	p_A;
 		Particle*	p_B;
 		Scalar		impulse;
-		Vec2		loc_anchor_A;
-		Vec2		loc_anchor_B;
 	};
 
 	struct Rod : public Link
@@ -50,7 +48,5 @@ namespace PX
 		float freq; 
 		float damping_ratio;
 		float dt; 
-		float C;
-		Vec2 err;
 	};
 }

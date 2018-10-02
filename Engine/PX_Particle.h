@@ -2,6 +2,7 @@
 
 #include "PX_Math.h"
 #include <vector>
+#include "Colors.h"
 
 class Graphics;
 
@@ -10,7 +11,7 @@ namespace PX
 	class Particle
 	{
 	public:
-		void	Set_Gravity( Scalar g );
+		void	Set_Restitution( Scalar e );
 		void	Set_Mass( Scalar m );
 		void	Set_Damp( Scalar d );
 		void	Set_Pos( const Vec2& p );
@@ -19,7 +20,7 @@ namespace PX
 		void	Apply_Impulse( const Vec2& p );
 		void	Clear_Forces();
 
-		Scalar	Get_Gravity() const;
+		Scalar  Get_Restitution() const;
 		Scalar	Get_Mass() const;
 		Scalar	Get_Inv_Mass() const;
 		Scalar	Get_Damp() const;
@@ -28,17 +29,17 @@ namespace PX
 		bool	has_Finite_Mass() const;
 
 		void	Debug_Draw( Graphics& gfx ) const;
-
+		mutable Color	c = Colors::Red;
 	//private:
 		// World is responsible of updating obj state
 		//friend class World;
 
 		void	Update( Scalar dt );
-		bool static_particle = false;
+
 	private:
-		Scalar	gravity = 10.0f;
 		Scalar	mass;
 		Scalar	inv_mass = 0.0f;
+		Scalar	restitution = 1.0f;
 		Scalar	damp;
 
 		Vec2	forces = Vec2 { 0.0f,0.0f };

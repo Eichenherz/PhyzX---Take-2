@@ -20,19 +20,16 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
-#include <numeric>
 #include <cassert>
-#include <sstream>
 
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd )
 {
-	const auto inf = std::numeric_limits<float>::infinity();
-	q0.Set_Mass( 1.0f );
-	q1.Set_Mass( 5.0f );
-	q2.Set_Mass( 7.0f );
+	q0.Set_Mass( 2.0f );
+	q1.Set_Mass( 2.0f );
+	q2.Set_Mass( 2.0f );
 
 	q0.Set_Pos( PX::Vec2 { 420.0f,320.0f } );
 	q1.Set_Pos( PX::Vec2 { 400.0f,280.0f } );
@@ -46,23 +43,14 @@ Game::Game( MainWindow& wnd )
 	q1.Set_Damp( 0.95f );
 	q2.Set_Damp( 0.95f );
 
-	spring.freq = 3.0f;
-	spring.damping_ratio = 0.1f;
-	spring.rest_length = 50.0f;
+	rod.rod_length = 50.0f;
 
-	spring1.freq = 3.0f;
-	spring1.damping_ratio = 0.1f;
-	spring1.rest_length = 50.0f;
+	rod1.rod_length = 50.0f;
 
-	spring2.freq = 3.0f;
-	spring2.damping_ratio = 0.1f;
 
-	const auto len = ( q1.Get_Pos() - q0.Get_Pos() ).GetLength();
-	spring2.rest_length = len;
-
-	spring.Init( &q0, &q1, q0.Get_Pos(), q1.Get_Pos() );
-	spring1.Init( &q0, &q2, q0.Get_Pos(), q2.Get_Pos() );
-	spring2.Init( &q1, &q2, q1.Get_Pos(), q2.Get_Pos() );
+	rod.Init( &q0, &q1 );
+	rod1.Init( &q0, &q2 );
+	
 }
 
 void Game::Go()
@@ -75,7 +63,7 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	const auto dt = timer.Mark();
+	auto dt = timer.Mark();
 
 	const PX::Vec2 mouse_pos = wnd.mouse.GetPos();
 	if ( wnd.mouse.LeftIsPressed() )
@@ -84,25 +72,29 @@ void Game::UpdateModel()
 		q0.Apply_Impulse( p );
 	}
 
-	std::wostringstream oss;
-
-	spring.Set_Timestep( dt );
-	spring1.Set_Timestep( dt );
-	spring2.Set_Timestep( dt );
-	for ( size_t i = 0; i < 2; ++i )
+	PX::Manifold	m;
+	//while ( elapsed_time > 0.0f )
 	{
-		spring.Solve();
-		spring1.Solve();
-		spring2.Solve();
+		//const auto dt = std::min( h, elapsed_time );
+		//elapsed_time -= h;
 
-		oss << L"Pos_Err " << spring.C << L"\n";
-		OutputDebugString( oss.str().c_str() );
+		for ( size_t i = 0; i < 20; ++i )
+		{
+			PX::Detect_Particle_Collision( m, q1, q2 );
+			PX::Solve_Particle_Collision( m );
+		}
 
+		for ( size_t i = 0; i < 2; ++i )
+		{
+			rod.Solve();
+			//rod1.Solve();
+		}
+
+		q0.Update( dt );
+		q1.Update( dt );
+		q2.Update( dt );
 	}
 	
-	q0.Update( dt );
-	q1.Update( dt );
-	q2.Update( dt );
 }
 
 void Game::ComposeFrame()
