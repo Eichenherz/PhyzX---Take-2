@@ -27,6 +27,7 @@
 #include "Particle_Link.h"
 #include "Timer.h"
 #include "PX_Collision.h"
+#include <random>
 
 class Game
 {
@@ -52,5 +53,8 @@ private:
 	std::vector<PX::Particle> particles;
 	std::vector<PX::Wall> walls;
 	std::vector<std::unique_ptr<PX::Manifold>> manifolds;
+
+	std::mt19937 rng;
+	std::random_device rd;
 	/********************************/
 };

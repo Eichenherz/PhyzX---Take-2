@@ -20,29 +20,38 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
-#include <cassert>
+
 
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+	rng( rd() )
 {
-	particles.reserve( 3 );
-	for ( size_t i = 0; i < 3; ++i )
+	const size_t size = 100;
+	particles.reserve( size );
+	for ( size_t i = 0; i < size; ++i )
 	{
 		particles.emplace_back();
-		particles [i].Set_Mass( 2.0f + float( i ) );
 	}
 
 	for ( auto& p : particles )
 	{
+		p.Set_Mass( 2.0f );
 		p.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
 		p.Set_Damp( 0.95f );
+
+
+		std::uniform_int_distribution<int> x_dist( 8, 700 );
+		std::uniform_int_distribution<int> y_dist( 8, 500 );
+		const float x = (float) x_dist( rng );
+		const float y = (float) x_dist( rng );
+		p.Set_Pos( PX::Vec2 { x,y } );
 	}
 
-	particles[0].Set_Pos( PX::Vec2 { 420.0f,320.0f } );
+	/*particles[0].Set_Pos( PX::Vec2 { 420.0f,320.0f } );
 	particles[1].Set_Pos( PX::Vec2 { 400.0f,280.0f } );
-	particles[2].Set_Pos( PX::Vec2 { 420.0f,340.0f } );
+	particles[2].Set_Pos( PX::Vec2 { 420.0f,340.0f } );*/
 
 	{
 		walls.reserve( 4 );
@@ -89,8 +98,12 @@ void Game::UpdateModel()
 		particles [0].Apply_Impulse( p );
 	}
 
+	for ( auto& p : particles )
+	{
+		p.Apply_Force( PX::Vec2 { 0.0f,0.0f } );
+	}
+
 	PX::Broad_Phase( particles, walls, manifolds );
-	
 
 	for ( size_t i = 0; i < 4; ++i )
 	{
