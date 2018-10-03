@@ -6,6 +6,8 @@
 
 class Graphics;
 
+
+// STD PARICLE RADIUS = 4.0f
 namespace PX
 {
 	class Particle
@@ -18,6 +20,7 @@ namespace PX
 		void	Set_Vel( const Vec2& v );
 		void	Apply_Force( const Vec2& f );
 		void	Apply_Impulse( const Vec2& p );
+		void	Add_Vel( const Vec2& v );
 		void	Clear_Forces();
 
 		Scalar  Get_Restitution() const;
@@ -29,7 +32,6 @@ namespace PX
 		bool	has_Finite_Mass() const;
 
 		void	Debug_Draw( Graphics& gfx ) const;
-		mutable Color	c = Colors::Red;
 	//private:
 		// World is responsible of updating obj state
 		//friend class World;

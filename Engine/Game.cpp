@@ -72,7 +72,7 @@ void Game::UpdateModel()
 		q0.Apply_Impulse( p );
 	}
 
-	PX::Manifold	m;
+	
 	//while ( elapsed_time > 0.0f )
 	{
 		//const auto dt = std::min( h, elapsed_time );
@@ -80,8 +80,7 @@ void Game::UpdateModel()
 
 		for ( size_t i = 0; i < 20; ++i )
 		{
-			PX::Detect_Particle_Collision( m, q1, q2 );
-			PX::Solve_Particle_Collision( m );
+			
 		}
 
 		for ( size_t i = 0; i < 2; ++i )

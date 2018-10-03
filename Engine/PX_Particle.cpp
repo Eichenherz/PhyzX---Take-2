@@ -43,6 +43,12 @@ void PX::Particle::Apply_Impulse( const Vec2 & p )
 	vel += p * inv_mass;
 }
 
+void PX::Particle::Add_Vel( const Vec2 & v )
+{
+	if ( !has_Finite_Mass() ) return;
+	vel += v;
+}
+
 void PX::Particle::Clear_Forces()
 {
 	forces = Vec2 { 0.0f,0.0f };
@@ -102,7 +108,7 @@ void PX::Particle::Debug_Draw( Graphics & gfx ) const
 	};
 
 	std::for_each( vertices.begin(), vertices.end(), xform );
-	gfx.Draw_Closed_Polyline( vertices.begin(), vertices.end(), c );
+	gfx.Draw_Closed_Polyline( vertices.begin(), vertices.end(), Colors::Red );
 }
 
 void PX::Particle::Update( Scalar dt )
