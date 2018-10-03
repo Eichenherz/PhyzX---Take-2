@@ -27,31 +27,48 @@ Game::Game( MainWindow& wnd )
 	wnd( wnd ),
 	gfx( wnd )
 {
-	q0.Set_Mass( 2.0f );
-	q1.Set_Mass( 2.0f );
-	q2.Set_Mass( 2.0f );
+	particles.reserve( 3 );
+	for ( size_t i = 0; i < 3; ++i )
+	{
+		particles.emplace_back();
+		particles [i].Set_Mass( 2.0f + float( i ) );
+	}
 
-	q0.Set_Pos( PX::Vec2 { 420.0f,320.0f } );
-	q1.Set_Pos( PX::Vec2 { 400.0f,280.0f } );
-	q2.Set_Pos( PX::Vec2 { 420.0f,340.0f } );
+	for ( auto& p : particles )
+	{
+		p.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
+		p.Set_Damp( 0.95f );
+	}
 
-	q0.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
-	q1.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
-	q2.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
+	particles[0].Set_Pos( PX::Vec2 { 420.0f,320.0f } );
+	particles[1].Set_Pos( PX::Vec2 { 400.0f,280.0f } );
+	particles[2].Set_Pos( PX::Vec2 { 420.0f,340.0f } );
 
-	q0.Set_Damp( 0.95f );
-	q1.Set_Damp( 0.95f );
-	q2.Set_Damp( 0.95f );
+	{
+		walls.reserve( 4 );
+		for ( size_t i = 0; i < 4; ++i )
+		{
+			walls.emplace_back();
+		}
 
-	rod.rod_length = 50.0f;
+		walls [0].A = PX::Vec2 { 0.0f,0.0f };
+		walls [0].B = PX::Vec2 { float( Graphics::ScreenWidth ),0.0f };
+		walls [0].normal = PX::Vec2 { 0.0f,1.0f };
 
-	rod1.rod_length = 50.0f;
+		walls [1].A = PX::Vec2 { float( Graphics::ScreenWidth ),0.0f };
+		walls [1].B = PX::Vec2 { float( Graphics::ScreenWidth ),float( Graphics::ScreenHeight ) };
+		walls [1].normal = PX::Vec2 { -1.0f,0.0f };
 
+		walls [2].A = PX::Vec2 { float( Graphics::ScreenWidth ),float( Graphics::ScreenHeight ) };
+		walls [2].B = PX::Vec2 { 0.0f,float( Graphics::ScreenHeight ) };
+		walls [2].normal = PX::Vec2 { 0.0f,-1.0f };
 
-	rod.Init( &q0, &q1 );
-	rod1.Init( &q0, &q2 );
-	
+		walls [3].A = PX::Vec2 { 0.0f,float( Graphics::ScreenHeight ) };
+		walls [3].B = PX::Vec2 { 0.0f,0.0f };
+		walls [3].normal = PX::Vec2 { 1.0f,0.0f };
+	}
 }
+
 
 void Game::Go()
 {
@@ -63,42 +80,43 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	auto dt = timer.Mark();
+	const auto dt = timer.Mark();
 
 	const PX::Vec2 mouse_pos = wnd.mouse.GetPos();
 	if ( wnd.mouse.LeftIsPressed() )
 	{
-		const PX::Vec2 p = mouse_pos - q0.Get_Pos();
-		q0.Apply_Impulse( p );
+		const PX::Vec2 p = mouse_pos - particles[0].Get_Pos();
+		particles [0].Apply_Impulse( p );
 	}
 
+	PX::Broad_Phase( particles, walls, manifolds );
 	
-	//while ( elapsed_time > 0.0f )
+
+	for ( size_t i = 0; i < 4; ++i )
 	{
-		//const auto dt = std::min( h, elapsed_time );
-		//elapsed_time -= h;
-
-		for ( size_t i = 0; i < 20; ++i )
+		PX::Filter_Contacts( manifolds );
+		for ( auto& m : manifolds )
 		{
-			
+			m->Solve();
 		}
+	}
 
-		for ( size_t i = 0; i < 2; ++i )
-		{
-			rod.Solve();
-			//rod1.Solve();
-		}
+	for ( size_t i = 0; i < 2; ++i )
+	{
+		// Joints
+	}
 
-		q0.Update( dt );
-		q1.Update( dt );
-		q2.Update( dt );
+	for ( auto& p : particles )
+	{
+		p.Update( dt );
 	}
 	
 }
 
 void Game::ComposeFrame()
 {
-	q0.Debug_Draw( gfx );
-	q1.Debug_Draw( gfx );
-	q2.Debug_Draw( gfx );
+	for ( auto& p : particles )
+	{
+		p.Debug_Draw( gfx );
+	}
 }

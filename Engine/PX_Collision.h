@@ -17,7 +17,7 @@ namespace PX
 	};
 	struct Manifold;
 
-	bool Detect_Collision( const Particle& p0, const Particle& p1 );
+	inline bool Detect_Collision( const Particle& p0, const Particle& p1 );
 	void Broad_Phase( const std::vector<Particle>& particles, const std::vector<Wall>& walls,
 					  std::vector<std::unique_ptr<Manifold>>& manifolds );
 	void Filter_Contacts( std::vector<std::unique_ptr<Manifold>>& manifolds );

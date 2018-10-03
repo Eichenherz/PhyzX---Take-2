@@ -49,11 +49,8 @@ private:
 	const float h = 0.0125f;
 	Timer			timer;
 
-	PX::Particle	q0;
-	PX::Particle	q1;
-	PX::Particle	q2;
-	
-	PX::Rod		rod;
-	PX::Rod		rod1;
+	std::vector<PX::Particle> particles;
+	std::vector<PX::Wall> walls;
+	std::vector<std::unique_ptr<PX::Manifold>> manifolds;
 	/********************************/
 };

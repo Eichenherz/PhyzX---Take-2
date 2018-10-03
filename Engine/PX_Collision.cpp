@@ -3,7 +3,7 @@
 #include <algorithm>
 
 
-bool PX::Detect_Collision( const Particle & p0, const Particle & p1 )
+inline bool PX::Detect_Collision( const Particle & p0, const Particle & p1 )
 {
 	// Paricle radius is 4.0f
 	constexpr float TWO_RADIUS_SQ = 64.0f;
@@ -15,10 +15,13 @@ bool PX::Detect_Collision( const Particle & p0, const Particle & p1 )
 void PX::Broad_Phase( const std::vector<PX::Particle>& particles, const std::vector<Wall>& walls,
 					  std::vector<std::unique_ptr<Manifold>>& manifolds )
 {
+	const auto size = ( particles.size() + walls.size() ) * particles.size();
+	manifolds.reserve( size );
+
 	// O(n^2) broadpahse
-	for ( auto I = particles.cbegin(); I != particles.cend(); ++I )
+	for ( auto I = particles.cbegin(); I != std::prev( particles.cend() ); ++I )
 	{
-		for ( auto J = I++; J != particles.cend(); ++J )
+		for ( auto J = std::next(I); J != particles.cend(); ++J )
 		{
 			const auto contact = Detect_Collision( *I, *J );
 			if ( contact )
@@ -41,6 +44,8 @@ void PX::Broad_Phase( const std::vector<PX::Particle>& particles, const std::vec
 			}
 		}
 	}
+
+	manifolds.shrink_to_fit();
 }
 
 void PX::Filter_Contacts( std::vector<std::unique_ptr<Manifold>>& manifolds )
@@ -50,6 +55,7 @@ void PX::Filter_Contacts( std::vector<std::unique_ptr<Manifold>>& manifolds )
 		return !m->Update();
 	};
 	manifolds.erase( std::remove_if( manifolds.begin(), manifolds.end(), filter ), manifolds.end() );
+	manifolds.shrink_to_fit();
 }
 
 PX::Particle_Manifold::Particle_Manifold( const Particle & p0, const Particle & p1 )
@@ -114,14 +120,14 @@ PX::Border_Manifold::Border_Manifold( const Particle & p, const Wall & w )
 	p_A = const_cast<Particle*>( std::addressof( p ) );
 }
 
-bool PX::Border_Manifold::Update()
+bool PX::Border_Manifold::Update() 
 {
 	// Set a pseudo-fixture for mass-pts.
 	constexpr float PARTICLE_RADIUS = 4.0f;
 
 	const Vec2 Ua = VA - p_A->Get_Pos();
 	const Vec2 Uba = VB - VA;
-	const float interpolant = Ua.dot( Uba ) / Uba.dot( Uba );
+	const float interpolant = -Ua.dot( Uba ) / Uba.dot( Uba );
 
 	const Vec2 Ux = Ua + Uba * interpolant;
 
