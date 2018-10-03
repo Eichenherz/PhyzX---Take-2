@@ -28,7 +28,7 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
 	rng( rd() )
 {
-	const size_t size = 100;
+	const size_t size = 20;
 	particles.reserve( size );
 	for ( size_t i = 0; i < size; ++i )
 	{
@@ -48,10 +48,6 @@ Game::Game( MainWindow& wnd )
 		const float y = (float) x_dist( rng );
 		p.Set_Pos( PX::Vec2 { x,y } );
 	}
-
-	/*particles[0].Set_Pos( PX::Vec2 { 420.0f,320.0f } );
-	particles[1].Set_Pos( PX::Vec2 { 400.0f,280.0f } );
-	particles[2].Set_Pos( PX::Vec2 { 420.0f,340.0f } );*/
 
 	{
 		walls.reserve( 4 );
@@ -76,6 +72,24 @@ Game::Game( MainWindow& wnd )
 		walls [3].B = PX::Vec2 { 0.0f,0.0f };
 		walls [3].normal = PX::Vec2 { 1.0f,0.0f };
 	}
+
+
+	{
+		s0.Init( &particles [0], &particles [1] );
+		s0.freq = 2.5f;
+		s0.damping_ratio = 0.1f;
+		s0.rest_length = 50.f;
+
+		s1.Init( &particles [1], &particles [2] );
+		s1.freq = 2.5f;
+		s1.damping_ratio = 0.1f;
+		s1.rest_length = 50.f;
+
+		s2.Init( &particles [2], &particles [0] );
+		s2.freq = 2.5f;
+		s2.damping_ratio = 0.1f;
+		s2.rest_length = 50.0f;
+	}
 }
 
 
@@ -98,11 +112,6 @@ void Game::UpdateModel()
 		particles [0].Apply_Impulse( p );
 	}
 
-	for ( auto& p : particles )
-	{
-		p.Apply_Force( PX::Vec2 { 0.0f,0.0f } );
-	}
-
 	PX::Broad_Phase( particles, walls, manifolds );
 
 	for ( size_t i = 0; i < 4; ++i )
@@ -114,9 +123,14 @@ void Game::UpdateModel()
 		}
 	}
 
+	s0.Set_Timestep( dt );
+	s1.Set_Timestep( dt );
+	s2.Set_Timestep( dt );
 	for ( size_t i = 0; i < 2; ++i )
 	{
-		// Joints
+		s0.Solve();
+		s1.Solve();
+		s2.Solve();
 	}
 
 	for ( auto& p : particles )

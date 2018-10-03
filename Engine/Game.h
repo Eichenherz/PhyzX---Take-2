@@ -56,5 +56,9 @@ private:
 
 	std::mt19937 rng;
 	std::random_device rd;
+
+	PX::Spring s0;
+	PX::Spring s1;
+	PX::Spring s2;
 	/********************************/
 };
