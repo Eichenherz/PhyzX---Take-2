@@ -63,20 +63,20 @@ Game::Game( MainWindow& wnd )
 			walls.emplace_back();
 		}
 
-		walls [0].A = PX::Vec2 { 0.0f,0.0f };
-		walls [0].B = PX::Vec2 { float( Graphics::ScreenWidth ),0.0f };
+		walls [0].A = PX::Vec2 { 2.0f,2.0f };
+		walls [0].B = PX::Vec2 { float( Graphics::ScreenWidth-2 ),2.0f };
 		walls [0].normal = PX::Vec2 { 0.0f,1.0f };
 
-		walls [1].A = PX::Vec2 { float( Graphics::ScreenWidth ),0.0f };
-		walls [1].B = PX::Vec2 { float( Graphics::ScreenWidth ),float( Graphics::ScreenHeight ) };
+		walls [1].A = PX::Vec2 { float( Graphics::ScreenWidth-2 ),2.0f };
+		walls [1].B = PX::Vec2 { float( Graphics::ScreenWidth-2 ),float( Graphics::ScreenHeight-2 ) };
 		walls [1].normal = PX::Vec2 { -1.0f,0.0f };
 
-		walls [2].A = PX::Vec2 { float( Graphics::ScreenWidth ),float( Graphics::ScreenHeight ) };
-		walls [2].B = PX::Vec2 { 0.0f,float( Graphics::ScreenHeight ) };
+		walls [2].A = PX::Vec2 { float( Graphics::ScreenWidth-2 ),float( Graphics::ScreenHeight -2) };
+		walls [2].B = PX::Vec2 { 2.0f,float( Graphics::ScreenHeight-2 ) };
 		walls [2].normal = PX::Vec2 { 0.0f,-1.0f };
 
-		walls [3].A = PX::Vec2 { 0.0f,float( Graphics::ScreenHeight ) };
-		walls [3].B = PX::Vec2 { 0.0f,0.0f };
+		walls [3].A = PX::Vec2 { 2.0f,float( Graphics::ScreenHeight -2) };
+		walls [3].B = PX::Vec2 { 2.0f,2.0f };
 		walls [3].normal = PX::Vec2 { 1.0f,0.0f };
 	}
 
@@ -129,7 +129,7 @@ void Game::UpdateModel()
 	}
 	PX::Broad_Phase( particles, walls, manifolds );
 
-	for ( size_t i = 0; i < 10; ++i )
+	for ( size_t i = 0; i < 4; ++i )
 	{
 		PX::Filter_Contacts( manifolds );
 		for ( auto& m : manifolds )
