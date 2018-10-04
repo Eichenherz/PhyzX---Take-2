@@ -124,6 +124,8 @@ bool PX::Border_Manifold::Update()
 {
 	// Set a pseudo-fixture for mass-pts.
 	constexpr float PARTICLE_RADIUS = 4.0f;
+	constexpr float PENETRATION_THRESHOLD = 0.01f;
+	constexpr float BIAS_FACTOR = 0.2f;
 
 	const Vec2 Ua = VA - p_A->Get_Pos();
 	const Vec2 Uba = VB - VA;
@@ -131,18 +133,24 @@ bool PX::Border_Manifold::Update()
 
 	const Vec2 Ux = Ua + Uba * interpolant;
 
-	if ( Ux.GetLengthSq() > 4.0f * PARTICLE_RADIUS * PARTICLE_RADIUS )
+	if ( Ux.GetLengthSq() > PARTICLE_RADIUS * PARTICLE_RADIUS )
 	{
 		return false;
 	}
 
 	// Normal is already set
+	const auto sep = Ux.GetLength() - PARTICLE_RADIUS;
+	if ( sep > PENETRATION_THRESHOLD )
+	{
+		separation = sep;
+	}
 
 	return true;
 }
 
 void PX::Border_Manifold::Solve()
 {
+	constexpr float PENETRATION_THRESHOLD = 0.01f;
 	// Might remove
 	if ( p_A == nullptr ) return;
 
@@ -153,8 +161,19 @@ void PX::Border_Manifold::Solve()
 
 	const auto restitution = p_A->Get_Restitution();
 	// Eff mass == particle's mass so don't ! 
-	const Scalar lambda = -( Scalar( 1 ) + restitution ) * contact_vel;
-	const Vec2 pseudo_P = normal * lambda;
+	Scalar lambda = -( Scalar( 1 ) + restitution ) * contact_vel;
+	// Clamp impulse
+	const auto new_impl = std::max( impulse + lambda, 0.0f );
+	lambda = new_impl - impulse;
+	impulse = new_impl;
 
+	const Vec2 pseudo_P = normal * lambda;
 	p_A->Add_Vel( pseudo_P );
+
+	
+	// Pos correction
+	const Scalar correction = std::clamp( 0.2f * ( separation + 0.005f ), -0.2f, 0.0f );
+	const Vec2 correction_P = -normal * correction;
+	//p_A->Add_Vel( correction_P );
+	p_A->Add_Pos( correction_P );
 }

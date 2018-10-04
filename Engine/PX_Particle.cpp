@@ -49,9 +49,20 @@ void PX::Particle::Add_Vel( const Vec2 & v )
 	vel += v;
 }
 
+void PX::Particle::Add_Pos( const Vec2 & p )
+{
+	if ( !has_Finite_Mass() ) return;
+	pos += p;
+}
+
 void PX::Particle::Clear_Forces()
 {
 	forces = Vec2 { 0.0f,0.0f };
+}
+
+void PX::Particle::Apply_Gravity( Scalar dt )
+{
+	vel += Vec2 { 0.0f,100.0f } *dt;
 }
 
 Scalar PX::Particle::Get_Restitution() const
@@ -92,7 +103,7 @@ bool PX::Particle::has_Finite_Mass() const
 void PX::Particle::Debug_Draw( Graphics & gfx ) const
 {
 	constexpr float		radius = 4.0f;
-	constexpr size_t	precision = 13; // do not change !!!
+	constexpr size_t	precision = 26; // do not change !!!
 	constexpr float		step = CONSTANTS::PI / 6.0f;
 	std::vector<Vec2>	vertices( precision );
 

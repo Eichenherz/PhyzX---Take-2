@@ -21,7 +21,9 @@ namespace PX
 		void	Apply_Force( const Vec2& f );
 		void	Apply_Impulse( const Vec2& p );
 		void	Add_Vel( const Vec2& v );
+		void	Add_Pos( const Vec2& p );
 		void	Clear_Forces();
+		void	Apply_Gravity( Scalar dt );
 
 		Scalar  Get_Restitution() const;
 		Scalar	Get_Mass() const;

@@ -31,6 +31,9 @@ namespace PX
 	public:
 		Vec2		normal;
 		Particle*	p_A;
+		Scalar		separation = 0.0f;
+		Scalar		impulse = 0.0f;
+		float		dt;
 	};
 
 	struct Border_Manifold : public Manifold

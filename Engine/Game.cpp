@@ -28,7 +28,7 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
 	rng( rd() )
 {
-	const size_t size = 20;
+	const size_t size = 10;
 	particles.reserve( size );
 	for ( size_t i = 0; i < size; ++i )
 	{
@@ -40,14 +40,21 @@ Game::Game( MainWindow& wnd )
 		p.Set_Mass( 2.0f );
 		p.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
 		p.Set_Damp( 0.95f );
+		p.Set_Restitution( 0.8f );
 
 
-		std::uniform_int_distribution<int> x_dist( 8, 700 );
-		std::uniform_int_distribution<int> y_dist( 8, 500 );
+		std::uniform_int_distribution<int> x_dist( 20, 700 );
+		std::uniform_int_distribution<int> y_dist( 20, 500 );
 		const float x = (float) x_dist( rng );
 		const float y = (float) x_dist( rng );
 		p.Set_Pos( PX::Vec2 { x,y } );
 	}
+
+
+
+	particles [0].Set_Mass( 10.0f );
+	particles [1].Set_Mass( 10.0f );
+	particles [2].Set_Mass( 10.0f );
 
 	{
 		walls.reserve( 4 );
@@ -76,19 +83,19 @@ Game::Game( MainWindow& wnd )
 
 	{
 		s0.Init( &particles [0], &particles [1] );
-		s0.freq = 2.5f;
-		s0.damping_ratio = 0.1f;
-		s0.rest_length = 50.f;
+		s0.freq = 3.0f;
+		s0.damping_ratio = 0.0f;
+		s0.rest_length = 20.f;
 
 		s1.Init( &particles [1], &particles [2] );
-		s1.freq = 2.5f;
-		s1.damping_ratio = 0.1f;
-		s1.rest_length = 50.f;
+		s1.freq = 3.0f;
+		s1.damping_ratio = 0.0f;
+		s1.rest_length = 20.f;
 
 		s2.Init( &particles [2], &particles [0] );
-		s2.freq = 2.5f;
-		s2.damping_ratio = 0.1f;
-		s2.rest_length = 50.0f;
+		s2.freq = 3.0f;
+		s2.damping_ratio = 0.0f;
+		s2.rest_length = 20.0f;
 	}
 }
 
@@ -109,12 +116,20 @@ void Game::UpdateModel()
 	if ( wnd.mouse.LeftIsPressed() )
 	{
 		const PX::Vec2 p = mouse_pos - particles[0].Get_Pos();
-		particles [0].Apply_Impulse( p );
+		particles [0].Apply_Impulse( p * 10.0f );
 	}
 
+	for ( auto& p : particles )
+	{
+		p.Apply_Gravity( dt );
+	}
+	for ( auto& m : manifolds )
+	{
+		m->dt = dt;
+	}
 	PX::Broad_Phase( particles, walls, manifolds );
 
-	for ( size_t i = 0; i < 4; ++i )
+	for ( size_t i = 0; i < 10; ++i )
 	{
 		PX::Filter_Contacts( manifolds );
 		for ( auto& m : manifolds )
