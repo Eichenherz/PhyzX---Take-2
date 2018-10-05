@@ -152,7 +152,7 @@ bool PX::Border_Manifold::Update()
 
 void PX::Border_Manifold::Solve()
 {
-	//p_A->Apply_Impulse( normal * impulse );
+	p_A->Apply_Impulse( normal * impulse );
 
 	const Scalar contact_vel = p_A->Get_Vel().dot( normal );
 
@@ -161,10 +161,10 @@ void PX::Border_Manifold::Solve()
 
 	// Baumgarte term
 	const auto bias = separation * 0.2f / dt;
-	const auto restitution = 0.0f;// p_A->Get_Restitution();
+	auto restitution = 0.0f;// p_A->Get_Restitution();
 	
-
-	Scalar lambda = -( Scalar( 1 ) + restitution ) * ( contact_vel + bias );
+	
+	Scalar lambda = -( Scalar( 1 ) + restitution ) * contact_vel + bias;
 	// Clamp impulse
 	const auto new_impl = std::max( impulse + lambda, 0.0f );
 	lambda = new_impl - impulse;

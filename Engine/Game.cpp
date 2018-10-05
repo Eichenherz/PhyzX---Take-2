@@ -39,7 +39,7 @@ Game::Game( MainWindow& wnd )
 	{
 		p.Set_Mass( 2.0f );
 		p.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
-		p.Set_Damp( 0.95f );
+		p.Set_Damp( 0.925f );
 		p.Set_Restitution( 0.8f );
 
 
