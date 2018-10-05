@@ -114,7 +114,7 @@ void PX::Particle_Manifold::Solve()
 
 PX::Border_Manifold::Border_Manifold( const Particle & p, const Wall & w )
 {
-	//normal = w.normal;
+	normal = w.normal;
 	VA = w.A;
 	VB = w.B;
 	p_A = const_cast<Particle*>( std::addressof( p ) );
@@ -124,9 +124,9 @@ bool PX::Border_Manifold::Update()
 {
 	// Set a pseudo-fixture for mass-pts.
 	constexpr float PARTICLE_RADIUS = 4.0f;
-	constexpr float PENETRATION_THRESHOLD = 0.01f;
-	constexpr float BIAS_FACTOR = 0.2f;
+	constexpr float PENETRATION_THRESHOLD = 0.001f;
 
+	// Compute displacement vector
 	const Vec2 Ua = VA - p_A->Get_Pos();
 	const Vec2 Uba = VB - VA;
 	const float interpolant = -Ua.dot( Uba ) / Uba.dot( Uba );
@@ -139,39 +139,43 @@ bool PX::Border_Manifold::Update()
 	}
 
 	// Normal is already set
-	normal = -Ux.GetNormalized();
+	//normal = -Ux.GetNormalized();
+
 	const auto sep = Ux.GetLength() - PARTICLE_RADIUS;
 	if ( sep > PENETRATION_THRESHOLD )
 	{
 		separation = sep;
 	}
-
+	
 	return true;
 }
 
 void PX::Border_Manifold::Solve()
 {
-	p_A->Apply_Impulse( normal * impulse );
+	//p_A->Apply_Impulse( normal * impulse );
 
 	const Scalar contact_vel = p_A->Get_Vel().dot( normal );
 
 	// Separating so leave alone
 	if ( contact_vel > 0.01f ) return;
 
-	const auto eff_mass = p_A->Get_Mass();
-	Scalar lambda = -eff_mass*( Scalar( 1 ) + p_A->Get_Restitution() ) * contact_vel;
+	// Baumgarte term
+	const auto bias = separation * 0.2f / dt;
+	const auto restitution = 0.0f;// p_A->Get_Restitution();
+	
+
+	Scalar lambda = -( Scalar( 1 ) + restitution ) * ( contact_vel + bias );
 	// Clamp impulse
 	const auto new_impl = std::max( impulse + lambda, 0.0f );
 	lambda = new_impl - impulse;
 	impulse = new_impl;
 
-	const Scalar ENERGY_DISSIPATION_COEF = 0.25f;
-	const Vec2 pseudo_P = normal * lambda;// / ENERGY_DISSIPATION_COEF;
-	p_A->Apply_Impulse( pseudo_P );
+	const Vec2 pseudo_P = normal * lambda;
+	p_A->Add_Vel( pseudo_P );
 
 	// Pos correction
-	const Scalar correction = std::clamp( 0.2f * ( separation + 0.005f ), -0.2f, 0.0f );
-	const Vec2 correction_P = -normal * correction * eff_mass;
-	//p_A->Apply_Impulse( -correction_P );
+	const auto eff_mass = p_A->Get_Mass();
+	const Scalar correction = std::max( separation - 0.01f, 0.0f ) * 0.2f * eff_mass;
+	const Vec2 correction_P = -normal * correction;
 	p_A->Add_Pos( correction_P );
 }
