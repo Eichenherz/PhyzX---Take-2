@@ -148,6 +148,7 @@ bool PX::Border_Manifold::Update()
 {
 	// Set a pseudo-fixture for mass-pts.
 	constexpr float PARTICLE_RADIUS = 4.0f;
+	constexpr float PENETRATION_THRESHOLD = 0.001f;
 
 	// Compute displacement vector
 	const Vec2 Ua = VA - p_A->Get_Pos();
@@ -156,13 +157,24 @@ bool PX::Border_Manifold::Update()
 
 	const Vec2 Ux = Ua + Uba * interpolant;
 
-	if ( Ux.GetLengthSq() > PARTICLE_RADIUS * PARTICLE_RADIUS )
+	if ( Ux.GetLengthSq() >= PARTICLE_RADIUS * PARTICLE_RADIUS )
 	{
 		return false;
 	}
 
 	// Normal is already set
-	separation = Ux.GetLength() - PARTICLE_RADIUS;
+	const auto sep = Ux.GetLength() - PARTICLE_RADIUS;
+	if ( (separation - sep ) < PENETRATION_THRESHOLD )
+	{
+		// If there is a very small difference in penetration depth, 
+		// from frame to frame, then we have a resting contact 
+		// so we don't need to add infinitely many manifolds;
+		return false;
+	}
+	else
+	{
+		separation = sep;
+	}
 	
 	return true;
 }
@@ -187,11 +199,6 @@ void PX::Border_Manifold::Solve()
 	const auto new_impl = std::max( impulse + lambda, 0.0f );
 	lambda = new_impl - impulse;
 	impulse = new_impl;
-
-	if ( impulse - 4.4f <= 0.1f )
-	{
-		impulse = 0.0f;
-	}
 	
 	const Vec2 pseudo_P = normal * lambda;
 	p_A->Add_Vel( pseudo_P );
