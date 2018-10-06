@@ -18,6 +18,7 @@ namespace PX
 	struct Manifold;
 
 	inline bool Detect_Collision( const Particle& p0, const Particle& p1 );
+	inline bool Particle_Wall( const Particle& p, const Wall& w );
 	void Broad_Phase( const std::vector<Particle>& particles, const std::vector<Wall>& walls,
 					  std::vector<std::unique_ptr<Manifold>>& manifolds );
 	void Filter_Contacts( std::vector<std::unique_ptr<Manifold>>& manifolds );
@@ -27,6 +28,7 @@ namespace PX
 	public:
 		virtual bool Update() = 0;
 		virtual void Solve() = 0;
+		virtual void Warm_Start() = 0;
 
 	public:
 		Vec2		normal;
@@ -42,6 +44,7 @@ namespace PX
 		Border_Manifold( const Particle& p, const Wall& w );
 		bool Update() override;
 		void Solve() override;
+		void Warm_Start() override;
 
 	public:
 		Vec2 VA;
@@ -54,6 +57,7 @@ namespace PX
 		Particle_Manifold( const Particle& p0, const Particle& p1 );
 		bool Update() override;
 		void Solve() override;
+		void Warm_Start() override;
 
 	public:
 		Particle* p_B;

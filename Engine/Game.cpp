@@ -43,8 +43,8 @@ Game::Game( MainWindow& wnd )
 		p.Set_Restitution( 0.8f );
 
 
-		std::uniform_int_distribution<int> x_dist( 20, 700 );
-		std::uniform_int_distribution<int> y_dist( 20, 500 );
+		std::uniform_int_distribution<int> x_dist( 100, 400 );
+		std::uniform_int_distribution<int> y_dist( 100, 400 );
 		const float x = (float) x_dist( rng );
 		const float y = (float) x_dist( rng );
 		p.Set_Pos( PX::Vec2 { x,y } );
@@ -83,19 +83,15 @@ Game::Game( MainWindow& wnd )
 
 	{
 		s0.Init( &particles [0], &particles [1] );
-		s0.freq = 3.0f;
-		s0.damping_ratio = 0.0f;
-		s0.rest_length = 20.f;
+		s0.rod_length = 20.f;
 
 		s1.Init( &particles [1], &particles [2] );
-		s1.freq = 3.0f;
-		s1.damping_ratio = 0.0f;
-		s1.rest_length = 20.f;
+		s1.rod_length = 20.f;
 
 		s2.Init( &particles [2], &particles [0] );
-		s2.freq = 3.0f;
-		s2.damping_ratio = 0.0f;
-		s2.rest_length = 20.0f;
+		/*s2.freq = 3.0f;
+		s2.damping_ratio = 0.0f;*/
+		s2.rod_length = 20.0f;
 	}
 }
 
@@ -128,19 +124,23 @@ void Game::UpdateModel()
 		m->dt = dt;
 	}
 	PX::Broad_Phase( particles, walls, manifolds );
+	PX::Filter_Contacts( manifolds );
 
-	for ( size_t i = 0; i < 4; ++i )
+	for ( auto& m : manifolds )
 	{
-		PX::Filter_Contacts( manifolds );
+		m->Warm_Start();
+	}
+	for ( size_t i = 0; i < 25; ++i )
+	{
 		for ( auto& m : manifolds )
 		{
 			m->Solve();
 		}
 	}
 
-	s0.Set_Timestep( dt );
+	/*s0.Set_Timestep( dt );
 	s1.Set_Timestep( dt );
-	s2.Set_Timestep( dt );
+	s2.Set_Timestep( dt )*/;
 	for ( size_t i = 0; i < 2; ++i )
 	{
 		s0.Solve();

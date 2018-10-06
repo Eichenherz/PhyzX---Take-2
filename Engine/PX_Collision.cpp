@@ -12,6 +12,28 @@ inline bool PX::Detect_Collision( const Particle & p0, const Particle & p1 )
 	return dist < TWO_RADIUS_SQ;
 }
 
+inline bool PX::Particle_Wall( const Particle & p, const Wall & w )
+{
+	// REDUNDANT //
+
+
+	// Set a pseudo-fixture for mass-pts.
+	constexpr float PARTICLE_RADIUS = 4.0f;
+
+	// Compute displacement vector
+	const Vec2 Ua = w.A - p.Get_Pos();
+	const Vec2 Uba = w.B - w.A;
+	const float interpolant = -Ua.dot( Uba ) / Uba.dot( Uba );
+
+	const Vec2 Ux = Ua + Uba * interpolant;
+
+	if ( Ux.GetLengthSq() > PARTICLE_RADIUS * PARTICLE_RADIUS )
+	{
+		return false;
+	}
+	return true;
+}
+
 void PX::Broad_Phase( const std::vector<PX::Particle>& particles, const std::vector<Wall>& walls,
 					  std::vector<std::unique_ptr<Manifold>>& manifolds )
 {
@@ -35,12 +57,10 @@ void PX::Broad_Phase( const std::vector<PX::Particle>& particles, const std::vec
 	{
 		for ( const auto& particle : particles )
 		{
-			auto m = std::make_unique<Border_Manifold>( particle, wall );
-			// Pre update to prevent unnecessary addition and deletion of border manifolds
-			// since circle-wall intersection is not as trivial as circle - circle
-			if ( m->Update() )
+			const auto contact = Particle_Wall( particle, wall );
+			if ( contact )
 			{
-				manifolds.emplace_back( std::move( m ) );
+				manifolds.emplace_back( std::make_unique<Border_Manifold>( particle, wall ) );
 			}
 		}
 	}
@@ -112,6 +132,10 @@ void PX::Particle_Manifold::Solve()
 	p_B->Apply_Impulse( P );
 }
 
+void PX::Particle_Manifold::Warm_Start()
+{
+}
+
 PX::Border_Manifold::Border_Manifold( const Particle & p, const Wall & w )
 {
 	normal = w.normal;
@@ -124,7 +148,6 @@ bool PX::Border_Manifold::Update()
 {
 	// Set a pseudo-fixture for mass-pts.
 	constexpr float PARTICLE_RADIUS = 4.0f;
-	constexpr float PENETRATION_THRESHOLD = 0.001f;
 
 	// Compute displacement vector
 	const Vec2 Ua = VA - p_A->Get_Pos();
@@ -139,43 +162,48 @@ bool PX::Border_Manifold::Update()
 	}
 
 	// Normal is already set
-	//normal = -Ux.GetNormalized();
-
-	const auto sep = Ux.GetLength() - PARTICLE_RADIUS;
-	if ( sep > PENETRATION_THRESHOLD )
-	{
-		separation = sep;
-	}
+	separation = Ux.GetLength() - PARTICLE_RADIUS;
 	
 	return true;
 }
 
 void PX::Border_Manifold::Solve()
 {
-	p_A->Apply_Impulse( normal * impulse );
-
 	const Scalar contact_vel = p_A->Get_Vel().dot( normal );
 
 	// Separating so leave alone
-	if ( contact_vel > 0.01f ) return;
+	if ( contact_vel > 0.0f ) return;
 
 	// Baumgarte term
-	const auto bias = separation * 0.2f / dt;
-	auto restitution = 0.0f;// p_A->Get_Restitution();
+	constexpr float PENETRATION_THRESHOLD = 0.01f;
+	constexpr float RESTITUION_THRESHOLD = 0.5f;
+	constexpr float baumgarte = 0.2f;
+	const auto bias = std::min( separation + PENETRATION_THRESHOLD, 0.0f ) * baumgarte / dt;
+	const auto restitution = p_A->Get_Restitution();
 	
-	
-	Scalar lambda = -( Scalar( 1 ) + restitution ) * contact_vel + bias;
+	const Scalar restituion_vel = std::max( contact_vel + RESTITUION_THRESHOLD, Scalar( 0 ) );
+	Scalar lambda = -( contact_vel + restitution * ( restituion_vel ) +bias );
 	// Clamp impulse
 	const auto new_impl = std::max( impulse + lambda, 0.0f );
 	lambda = new_impl - impulse;
 	impulse = new_impl;
 
+	if ( impulse - 4.4f <= 0.1f )
+	{
+		impulse = 0.0f;
+	}
+	
 	const Vec2 pseudo_P = normal * lambda;
 	p_A->Add_Vel( pseudo_P );
 
-	// Pos correction
-	const auto eff_mass = p_A->Get_Mass();
-	const Scalar correction = std::max( separation - 0.01f, 0.0f ) * 0.2f * eff_mass;
-	const Vec2 correction_P = -normal * correction;
-	p_A->Add_Pos( correction_P );
+	//// Pos correction
+	//const auto eff_mass = p_A->Get_Mass();
+	//const Scalar correction = std::max( separation - 0.01f, 0.0f ) * baumgarte * eff_mass;
+	//const Vec2 correction_P = -normal * correction;
+	//p_A->Add_Pos( correction_P );
+}
+
+void PX::Border_Manifold::Warm_Start()
+{
+	p_A->Add_Vel( normal * impulse );
 }

@@ -27,6 +27,11 @@ void PX::Rod::Solve()
 	/*******************/
 
 	dir.Normalize();
+	// Warm starting
+	const Vec2 warm_P = dir * impulse;
+	p_A->Apply_Impulse( -warm_P );
+	p_B->Apply_Impulse( warm_P );
+	/********************************/
 
 	const Scalar inv_mass_A = p_A->Get_Inv_Mass();
 	const Scalar inv_mass_B = p_B->Get_Inv_Mass();
