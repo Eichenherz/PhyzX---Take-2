@@ -18,6 +18,7 @@ namespace PX
 		void	Set_Damp( Scalar d );
 		void	Set_Pos( const Vec2& p );
 		void	Set_Vel( const Vec2& v );
+		// Don't use yet;
 		void	Apply_Force( const Vec2& f );
 		void	Apply_Impulse( const Vec2& p );
 		void	Add_Vel( const Vec2& v );

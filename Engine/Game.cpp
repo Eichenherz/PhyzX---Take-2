@@ -20,6 +20,7 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include <algorithm>
 
 
 Game::Game( MainWindow& wnd )
@@ -28,7 +29,7 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
 	rng( rd() )
 {
-	const size_t size = 10;
+	const size_t size = 50;
 	particles.reserve( size );
 	for ( size_t i = 0; i < size; ++i )
 	{
@@ -37,7 +38,7 @@ Game::Game( MainWindow& wnd )
 
 	for ( auto& p : particles )
 	{
-		p.Set_Mass( 2.0f );
+		p.Set_Mass( 5.0f );
 		p.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
 		p.Set_Damp( 0.925f );
 		p.Set_Restitution( 0.8f );
@@ -126,11 +127,18 @@ void Game::UpdateModel()
 	PX::Broad_Phase( particles, walls, manifolds );
 	PX::Filter_Contacts( manifolds );
 
+	// Sort to resolve most significant contacts first // Thanks Ian Millington ;-) !
+	std::sort( manifolds.begin(), manifolds.end(), 
+			   [] ( const std::unique_ptr<PX::Manifold>& m0, const std::unique_ptr<PX::Manifold>& m1 )
+			   {
+				   return m1->separation > m0->separation;
+			   } );
+
 	for ( auto& m : manifolds )
 	{
 		m->Warm_Start();
 	}
-	for ( size_t i = 0; i < 25; ++i )
+	for ( size_t i = 0; i < 4; ++i )
 	{
 		for ( auto& m : manifolds )
 		{

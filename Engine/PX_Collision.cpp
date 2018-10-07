@@ -199,15 +199,21 @@ void PX::Border_Manifold::Solve()
 	const auto new_impl = std::max( impulse + lambda, 0.0f );
 	lambda = new_impl - impulse;
 	impulse = new_impl;
+
+	if ( impulse - 4.4f <= 0.1f )
+	{
+		// If impulse is too small , make it zero;
+		impulse = 0.0f;
+	}
 	
 	const Vec2 pseudo_P = normal * lambda;
 	p_A->Add_Vel( pseudo_P );
 
-	//// Pos correction
-	//const auto eff_mass = p_A->Get_Mass();
-	//const Scalar correction = std::max( separation - 0.01f, 0.0f ) * baumgarte * eff_mass;
-	//const Vec2 correction_P = -normal * correction;
-	//p_A->Add_Pos( correction_P );
+	// Pos correction
+	const auto eff_mass = p_A->Get_Mass();
+	const Scalar correction = std::max( separation - 0.01f, 0.0f ) * baumgarte * eff_mass;
+	const Vec2 correction_P = -normal * correction;
+	p_A->Add_Pos( correction_P );
 }
 
 void PX::Border_Manifold::Warm_Start()
