@@ -4,9 +4,10 @@
 using namespace PX;
 
 
-void PX::Particle::Set_Gravity( Scalar g )
+void PX::Particle::Set_Restitution( Scalar e )
 {
-	gravity = g;
+	if ( !has_Finite_Mass() ) return;
+	restitution = e;
 }
 
 void PX::Particle::Set_Mass( Scalar m )
@@ -22,7 +23,7 @@ void PX::Particle::Set_Damp( Scalar d )
 
 void PX::Particle::Set_Pos( const Vec2 & p )
 {
-	if ( static_particle ) return;
+	if ( !has_Finite_Mass() ) return;
 
 	pos = p;
 }
@@ -39,9 +40,19 @@ void PX::Particle::Apply_Force( const Vec2 & f )
 
 void PX::Particle::Apply_Impulse( const Vec2 & p )
 {
-	if ( static_particle ) return;
-
 	vel += p * inv_mass;
+}
+
+void PX::Particle::Add_Vel( const Vec2 & v )
+{
+	if ( !has_Finite_Mass() ) return;
+	vel += v;
+}
+
+void PX::Particle::Add_Pos( const Vec2 & p )
+{
+	if ( !has_Finite_Mass() ) return;
+	pos += p;
 }
 
 void PX::Particle::Clear_Forces()
@@ -49,9 +60,14 @@ void PX::Particle::Clear_Forces()
 	forces = Vec2 { 0.0f,0.0f };
 }
 
-Scalar PX::Particle::Get_Gravity() const
+void PX::Particle::Apply_Gravity( Scalar dt )
 {
-	return gravity;
+	vel += Vec2 { 0.0f,100.0f } *dt;
+}
+
+Scalar PX::Particle::Get_Restitution() const
+{
+	return restitution;
 }
 
 Scalar PX::Particle::Get_Mass() const
@@ -86,16 +102,19 @@ bool PX::Particle::has_Finite_Mass() const
 
 void PX::Particle::Debug_Draw( Graphics & gfx ) const
 {
-	std::vector<Vec2> vertices = {
-		Vec2{ -1.0f,-1.0f },
-		Vec2{  1.0f,-1.0f },
-		Vec2{  1.0f, 1.0f },
-		Vec2{ -1.0f, 1.0f }
-	};
+	constexpr float		radius = 4.0f;
+	constexpr size_t	precision = 26; // do not change !!!
+	constexpr float		step = CONSTANTS::PI / 6.0f;
+	std::vector<Vec2>	vertices( precision );
+
+	for ( size_t i = 0; i < precision; ++i )
+	{
+		const Vec2 vertex = Vec2 { std::cos( float( i ) * step ), std::sin( float( i ) * step ) } *radius;
+		vertices [i] = std::move( vertex );
+	}
 
 	auto xform = [&] ( Vec2& vertex )
 	{
-		vertex *= 4.0f; // Scale
 		vertex += this->Get_Pos();
 	};
 
@@ -105,35 +124,13 @@ void PX::Particle::Debug_Draw( Graphics & gfx ) const
 
 void PX::Particle::Update( Scalar dt )
 {
-	if ( static_particle ) return;
+	if ( !has_Finite_Mass() ) return;
 
 	vel += forces * inv_mass * dt;
+	vel *= damp;
 	pos += vel * dt;
-	vel *= damp;
-
-
-	//// Predict pos.
-	//const auto old_pos = pos;
-	//pos += vel * dt + forces * inv_mass * dt * dt * 0.5f; 
-	//vel = ( pos - old_pos ) / dt;
-	//vel *= damp;
-
-	//Clear_Forces();
-}
-
-void PX::Particle::UpdateVel( Scalar dt )
-{
-	if ( static_particle ) return;
-
-	vel += forces * inv_mass * dt;
-	vel *= damp;
 
 	Clear_Forces();
-}
-
-void PX::Particle::UpdatePos( Scalar dt )
-{
-	pos += vel * dt;
 }
 
 void PX::Particle_Force_Registry::Insert( Particle & p, Particle_Force_Generator * fg )

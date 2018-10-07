@@ -149,7 +149,8 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Matrix2.h" />
     <ClInclude Include="Mouse.h" />
-    <ClInclude Include="Particle_Link.h" />
+    <ClInclude Include="PX_Particle_Link.h" />
+    <ClInclude Include="PX_Collision.h" />
     <ClInclude Include="PX_Math.h" />
     <ClInclude Include="PX_Particle.h" />
     <ClInclude Include="PX_World.h" />
@@ -169,7 +170,8 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Matrix2.cpp" />
     <ClCompile Include="Mouse.cpp" />
-    <ClCompile Include="Particle_Link.cpp" />
+    <ClCompile Include="PX_Particle_Link.cpp" />
+    <ClCompile Include="PX_Collision.cpp" />
     <ClCompile Include="PX_Math.cpp" />
     <ClCompile Include="PX_Particle.cpp" />
     <ClCompile Include="Sound.cpp" />

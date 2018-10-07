@@ -20,35 +20,82 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
-#include <numeric>
+#include <algorithm>
+
 
 Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
-	gfx( wnd )
+	gfx( wnd ),
+	rng( rd() )
 {
-	const auto static_mass = std::numeric_limits<float>::infinity();
-	q0.Set_Mass( 2.0f );
-	q1.Set_Mass( static_mass );
-	q2.Set_Mass( 2.0f );
+	const size_t size = 50;
+	particles.reserve( size );
+	for ( size_t i = 0; i < size; ++i )
+	{
+		particles.emplace_back();
+	}
 
-	q0.Set_Pos( PX::Vec2 { 420.0f,320.0f } );
-	q1.Set_Pos( PX::Vec2 { 420.0f,300.0f } );
-	q2.Set_Pos( PX::Vec2 { 420.0f,340.0f } );
+	for ( auto& p : particles )
+	{
+		p.Set_Mass( 5.0f );
+		p.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
+		p.Set_Damp( 0.925f );
+		p.Set_Restitution( 0.8f );
 
-	q0.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
-	q1.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
-	q2.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
 
-	q0.Set_Damp( 0.95f );
+		std::uniform_int_distribution<int> x_dist( 100, 400 );
+		std::uniform_int_distribution<int> y_dist( 100, 400 );
+		const float x = (float) x_dist( rng );
+		const float y = (float) x_dist( rng );
+		p.Set_Pos( PX::Vec2 { x,y } );
+	}
 
-	spring.freq = 4.0f;
-	spring.damping_ratio = 0.7f;
-	spring.rest_length = 50.0f;
-	spring.Init( &q0, &q1, q1.Get_Pos() );
 
-	q1.static_particle = true;
+
+	particles [0].Set_Mass( 10.0f );
+	particles [1].Set_Mass( 10.0f );
+	particles [2].Set_Mass( 10.0f );
+
+	{
+		walls.reserve( 4 );
+		for ( size_t i = 0; i < 4; ++i )
+		{
+			walls.emplace_back();
+		}
+
+		walls [0].A = PX::Vec2 { 2.0f,2.0f };
+		walls [0].B = PX::Vec2 { float( Graphics::ScreenWidth-2 ),2.0f };
+		walls [0].normal = PX::Vec2 { 0.0f,1.0f };
+
+		walls [1].A = PX::Vec2 { float( Graphics::ScreenWidth-2 ),2.0f };
+		walls [1].B = PX::Vec2 { float( Graphics::ScreenWidth-2 ),float( Graphics::ScreenHeight-2 ) };
+		walls [1].normal = PX::Vec2 { -1.0f,0.0f };
+
+		walls [2].A = PX::Vec2 { float( Graphics::ScreenWidth-2 ),float( Graphics::ScreenHeight -2) };
+		walls [2].B = PX::Vec2 { 2.0f,float( Graphics::ScreenHeight-2 ) };
+		walls [2].normal = PX::Vec2 { 0.0f,-1.0f };
+
+		walls [3].A = PX::Vec2 { 2.0f,float( Graphics::ScreenHeight -2) };
+		walls [3].B = PX::Vec2 { 2.0f,2.0f };
+		walls [3].normal = PX::Vec2 { 1.0f,0.0f };
+	}
+
+
+	{
+		s0.Init( &particles [0], &particles [1] );
+		s0.rod_length = 20.f;
+
+		s1.Init( &particles [1], &particles [2] );
+		s1.rod_length = 20.f;
+
+		s2.Init( &particles [2], &particles [0] );
+		/*s2.freq = 3.0f;
+		s2.damping_ratio = 0.0f;*/
+		s2.rod_length = 20.0f;
+	}
 }
+
 
 void Game::Go()
 {
@@ -65,27 +112,61 @@ void Game::UpdateModel()
 	const PX::Vec2 mouse_pos = wnd.mouse.GetPos();
 	if ( wnd.mouse.LeftIsPressed() )
 	{
-		const PX::Vec2 p = mouse_pos - q0.Get_Pos();
-		q0.Apply_Impulse( p * 0.5f );
+		const PX::Vec2 p = mouse_pos - particles[0].Get_Pos();
+		particles [0].Apply_Impulse( p * 10.0f );
 	}
-	if ( wnd.mouse.RightIsPressed() )
+
+	for ( auto& p : particles )
 	{
-		q0.Clear_Forces();
+		p.Apply_Gravity( dt );
+	}
+	for ( auto& m : manifolds )
+	{
+		m->dt = dt;
+	}
+	PX::Broad_Phase( particles, walls, manifolds );
+	PX::Filter_Contacts( manifolds );
+
+	// Sort to resolve most significant contacts first // Thanks Ian Millington ;-) !
+	std::sort( manifolds.begin(), manifolds.end(), 
+			   [] ( const std::unique_ptr<PX::Manifold>& m0, const std::unique_ptr<PX::Manifold>& m1 )
+			   {
+				   return m1->separation > m0->separation;
+			   } );
+
+	for ( auto& m : manifolds )
+	{
+		m->Warm_Start();
+	}
+	for ( size_t i = 0; i < 4; ++i )
+	{
+		for ( auto& m : manifolds )
+		{
+			m->Solve();
+		}
+	}
+
+	/*s0.Set_Timestep( dt );
+	s1.Set_Timestep( dt );
+	s2.Set_Timestep( dt )*/;
+	for ( size_t i = 0; i < 2; ++i )
+	{
+		s0.Solve();
+		s1.Solve();
+		s2.Solve();
+	}
+
+	for ( auto& p : particles )
+	{
+		p.Update( dt );
 	}
 	
-	spring.Set_Timestep( dt );
-	for ( auto i = 0; i < 20; ++i )
-	{
-		spring.Solve();
-	}
-	
-	q0.Update( dt );
-	q1.Update( dt );
 }
 
 void Game::ComposeFrame()
 {
-	q0.Debug_Draw( gfx );
-	q1.Debug_Draw( gfx );
-	//q2.Debug_Draw( gfx );
+	for ( auto& p : particles )
+	{
+		p.Debug_Draw( gfx );
+	}
 }

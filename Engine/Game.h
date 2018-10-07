@@ -24,8 +24,10 @@
 #include "Mouse.h"
 #include "Graphics.h"
 #include "PX_Particle.h"
-#include "Particle_Link.h"
+#include "PX_Particle_Link.h"
 #include "Timer.h"
+#include "PX_Collision.h"
+#include <random>
 
 class Game
 {
@@ -45,16 +47,18 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
+	const float h = 0.0125f;
 	Timer			timer;
 
-	PX::Particle	q0;
-	PX::Particle	q1;
-	PX::Particle	q2;
-	PX::Rod			rod;
-	PX::Rod			rod1;
-	PX::Rod			rod2;
-	PX::Cable		cable;
-	PX::Spring		spring;
-	PX::XPBD_Link	XPDB;
+	std::vector<PX::Particle> particles;
+	std::vector<PX::Wall> walls;
+	std::vector<std::unique_ptr<PX::Manifold>> manifolds;
+
+	std::mt19937 rng;
+	std::random_device rd;
+
+	PX::Rod s0;
+	PX::Rod s1;
+	PX::Rod s2;
 	/********************************/
 };
