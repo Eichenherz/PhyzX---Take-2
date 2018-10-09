@@ -16,6 +16,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{8b6c92a8-f65d-451e-80e3-d65773602b92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PhyzX">
+      <UniqueIdentifier>{d3116b53-4f96-4588-ae32-a8677742e65b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChiliWin.h">
@@ -66,20 +69,20 @@
     <ClInclude Include="Vec3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PX_World.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="PhyzX\PX_Collision.h">
+      <Filter>PhyzX</Filter>
     </ClInclude>
-    <ClInclude Include="PX_Math.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="PhyzX\PX_Math.h">
+      <Filter>PhyzX</Filter>
     </ClInclude>
-    <ClInclude Include="PX_Particle.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="PhyzX\PX_Particle.h">
+      <Filter>PhyzX</Filter>
     </ClInclude>
-    <ClInclude Include="PX_Collision.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="PhyzX\PX_Particle_Link.h">
+      <Filter>PhyzX</Filter>
     </ClInclude>
-    <ClInclude Include="PX_Particle_Link.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="PhyzX\PX_World.h">
+      <Filter>PhyzX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -116,17 +119,17 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PX_Math.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="PhyzX\PX_Collision.cpp">
+      <Filter>PhyzX</Filter>
     </ClCompile>
-    <ClCompile Include="PX_Particle.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="PhyzX\PX_Particle.cpp">
+      <Filter>PhyzX</Filter>
     </ClCompile>
-    <ClCompile Include="PX_Collision.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="PhyzX\PX_Math.cpp">
+      <Filter>PhyzX</Filter>
     </ClCompile>
-    <ClCompile Include="PX_Particle_Link.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="PhyzX\PX_Particle_Link.cpp">
+      <Filter>PhyzX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

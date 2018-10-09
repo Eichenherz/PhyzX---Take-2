@@ -24,7 +24,7 @@
 #include <wrl.h>
 #include "ChiliException.h"
 #include "Colors.h"
-#include "PX_Math.h"
+#include "PhyzX\PX_Math.h"
 #include <vector>
 #include <array>
 

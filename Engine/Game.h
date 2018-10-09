@@ -23,10 +23,10 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
-#include "PX_Particle.h"
-#include "PX_Particle_Link.h"
+#include "PhyzX\PX_Particle.h"
+#include "PhyzX\PX_Particle_Link.h"
 #include "Timer.h"
-#include "PX_Collision.h"
+#include "PhyzX\PX_Collision.h"
 #include <random>
 
 class Game
