@@ -23,11 +23,9 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
-#include "PhyzX\PX_Particle.h"
-#include "PhyzX\PX_Particle_Link.h"
 #include "Timer.h"
-#include "PhyzX\PX_Collision.h"
 #include <random>
+#include "PhyzX/PX_World.h"
 
 class Game
 {
@@ -47,18 +45,12 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-	const float h = 0.0125f;
-	Timer			timer;
+	const float			h = 0.0125f;
+	Timer				timer;
 
-	std::vector<PX::Particle> particles;
-	std::vector<PX::Wall> walls;
-	std::vector<std::unique_ptr<PX::Manifold>> manifolds;
+	std::mt19937		rng;
+	std::random_device	rd;
 
-	std::mt19937 rng;
-	std::random_device rd;
-
-	PX::Rod s0;
-	PX::Rod s1;
-	PX::Rod s2;
+	PX::World			world;
 	/********************************/
 };

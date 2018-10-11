@@ -1,8 +1,8 @@
 #pragma once
 
-#include "PX_Particle.h"
-#include "PX_Particle_Link.h"
-#include "PX_Collision.h"
+#include "PhyzX\PX_Particle.h"
+#include "PhyzX\PX_Particle_Link.h"
+#include "PhyzX\PX_Collision.h"
 #include <vector>
 #include <random>
 
@@ -13,7 +13,7 @@ namespace PX
 	class World
 	{
 	public:
-		void Init_Sym( size_t size, const std::mt19937& rng );
+		void Init_Sym( size_t size, std::mt19937& rng );
 		void Apply_Mouse_Imput( const Vec2& pos );
 		void Update( Scalar dt );
 		void Draw( Graphics& gfx );

@@ -69,19 +69,19 @@
     <ClInclude Include="Vec3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PhyzX\PX_Collision.h">
+    <ClInclude Include="PX_Collision.h">
       <Filter>PhyzX</Filter>
     </ClInclude>
-    <ClInclude Include="PhyzX\PX_Math.h">
+    <ClInclude Include="PX_Math.h">
       <Filter>PhyzX</Filter>
     </ClInclude>
-    <ClInclude Include="PhyzX\PX_Particle.h">
+    <ClInclude Include="PX_Particle.h">
       <Filter>PhyzX</Filter>
     </ClInclude>
-    <ClInclude Include="PhyzX\PX_Particle_Link.h">
+    <ClInclude Include="PX_Particle_Link.h">
       <Filter>PhyzX</Filter>
     </ClInclude>
-    <ClInclude Include="PhyzX\PX_World.h">
+    <ClInclude Include="PX_World.h">
       <Filter>PhyzX</Filter>
     </ClInclude>
   </ItemGroup>
@@ -119,17 +119,20 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PhyzX\PX_Collision.cpp">
+    <ClCompile Include="PX_Collision.cpp">
       <Filter>PhyzX</Filter>
     </ClCompile>
-    <ClCompile Include="PhyzX\PX_Particle.cpp">
+    <ClCompile Include="PX_Math.cpp">
       <Filter>PhyzX</Filter>
     </ClCompile>
-    <ClCompile Include="PhyzX\PX_Math.cpp">
+    <ClCompile Include="PX_Particle.cpp">
       <Filter>PhyzX</Filter>
     </ClCompile>
-    <ClCompile Include="PhyzX\PX_Particle_Link.cpp">
+    <ClCompile Include="PX_Particle_Link.cpp">
       <Filter>PhyzX</Filter>
+    </ClCompile>
+    <ClCompile Include="PX_World.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
