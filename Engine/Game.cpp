@@ -46,7 +46,7 @@ void Game::UpdateModel()
 {
 	const auto dt = timer.Mark();
 
-	const PX::Vec2 mouse_pos = wnd.mouse.GetPos();
+	const Vec2 mouse_pos = wnd.mouse.GetPos();
 	if ( wnd.mouse.LeftIsPressed() )
 	{
 		world.Apply_Mouse_Imput( mouse_pos );

@@ -155,6 +155,7 @@
     <ClInclude Include="PX_Particle_Link.h" />
     <ClInclude Include="PX_World.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="RX_Body.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundEffect.h" />
     <ClInclude Include="Timer.h" />

@@ -71,7 +71,7 @@ public:
 		{
 			return type;
 		}
-		PX::Vec2 GetPos() const
+		Vec2 GetPos() const
 		{
 			return{ float(x),float(y) };
 		}
@@ -96,7 +96,7 @@ public:
 	Mouse() = default;
 	Mouse( const Mouse& ) = delete;
 	Mouse& operator=( const Mouse& ) = delete;
-	PX::Vec2 GetPos() const;
+	Vec2 GetPos() const;
 	int GetPosX() const;
 	int GetPosY() const;
 	bool LeftIsPressed() const;

@@ -319,7 +319,7 @@ void Graphics::PutPixel( int x,int y,Color c )
 	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
 }
 
-void Graphics::Draw_Line( PX::Vec2 p1, PX::Vec2 p2, Color c )
+void Graphics::Draw_Line( Vec2 p1, Vec2 p2, Color c )
 {
 	const float	slope = (p2.y - p1.y )/ (p2.x - p1.x);
 
@@ -354,7 +354,7 @@ void Graphics::Draw_Line( PX::Vec2 p1, PX::Vec2 p2, Color c )
 	}
 }
 
-void Graphics::Draw_Clipped_Line( PX::Vec2 p1, PX::Vec2 p2, Color c )
+void Graphics::Draw_Clipped_Line( Vec2 p1, Vec2 p2, Color c )
 {
 	constexpr float x_min = 0.0f;//200.0f;
 	constexpr float x_max = float( ScreenWidth - 1 );//600.0f;
@@ -362,7 +362,7 @@ void Graphics::Draw_Clipped_Line( PX::Vec2 p1, PX::Vec2 p2, Color c )
 	constexpr float y_max = float( ScreenHeight - 1 );//500.0f;
 
 
-	std::function<unsigned char( const PX::Vec2& )> out_code = [&] ( const PX::Vec2& v )
+	std::function<unsigned char( const Vec2& )> out_code = [&] ( const Vec2& v )
 	{
 		// { LEFT/RIGHT/TOP/BOTTOM } bit positioning
 
@@ -407,18 +407,18 @@ void Graphics::Draw_Clipped_Line( PX::Vec2 p1, PX::Vec2 p2, Color c )
 	float                        t_min = 0.0f;
 	float                        t_max = 1.0f;
 
-	const std::array<PX::Vec2, 4>    screen_normals = {
-		PX::Vec2 {  0.0f,-1.0f },
-		PX::Vec2 {  1.0f, 0.0f },
-		PX::Vec2 {  0.0f, 1.0f },
-		PX::Vec2 { -1.0f, 0.0f }	 
+	const std::array<Vec2, 4>    screen_normals = {
+		Vec2 {  0.0f,-1.0f },
+		Vec2 {  1.0f, 0.0f },
+		Vec2 {  0.0f, 1.0f },
+		Vec2 { -1.0f, 0.0f }	 
 	};
 
-	const std::array<PX::Vec2, 4>    screen_vertices = {
-		PX::Vec2 { x_min, y_min },
-		PX::Vec2 { x_max, y_min },
-		PX::Vec2 { x_max, y_max },
-		PX::Vec2 { x_min, y_max }
+	const std::array<Vec2, 4>    screen_vertices = {
+		Vec2 { x_min, y_min },
+		Vec2 { x_max, y_min },
+		Vec2 { x_max, y_max },
+		Vec2 { x_min, y_max }
 	};
 	
 
@@ -453,8 +453,8 @@ void Graphics::Draw_Clipped_Line( PX::Vec2 p1, PX::Vec2 p2, Color c )
 
 	if ( t_min > t_max ) return;
 
-	PX::Vec2 v1_ = p1 + delta * t_min; 
-	PX::Vec2 v2_ = p1 + delta * t_max;
+	Vec2 v1_ = p1 + delta * t_min; 
+	Vec2 v2_ = p1 + delta * t_max;
 	return Draw_Line( v1_, v2_, c );
 }
 
@@ -467,7 +467,7 @@ void Graphics::Draw_Closed_Polyline( Iter beg, Iter end, Color c )
 	Draw_Clipped_Line( *std::prev( end ), *beg, c );
 }
 
-void Graphics::draw_line_test( PX::Vec2 p1, PX::Vec2 p2, Color c )
+void Graphics::draw_line_test( Vec2 p1, Vec2 p2, Color c )
 {
 	const float	slope = (p2.y - p1.y) / (p2.x - p1.x);
 	

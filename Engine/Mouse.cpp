@@ -21,7 +21,7 @@
 #include "Mouse.h"
 
 
-PX::Vec2 Mouse::GetPos() const
+Vec2 Mouse::GetPos() const
 {
 	return { float(x),float(y) };
 }

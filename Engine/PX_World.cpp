@@ -12,7 +12,7 @@ void PX::World::Init_Sym( size_t size, std::mt19937& rng )
 	for ( auto& p : particles )
 	{
 		p.Set_Mass( 5.0f );
-		p.Set_Vel( PX::Vec2 { 0.0f,0.0f } );
+		p.Set_Vel( Vec2 { 0.0f,0.0f } );
 		p.Set_Damp( 0.925f );
 		p.Set_Restitution( 0.8f );
 
@@ -21,7 +21,7 @@ void PX::World::Init_Sym( size_t size, std::mt19937& rng )
 		std::uniform_int_distribution<int> y_dist( 100, 400 );
 		const float x = (float) x_dist( rng );
 		const float y = (float) x_dist( rng );
-		p.Set_Pos( PX::Vec2 { x,y } );
+		p.Set_Pos( Vec2 { x,y } );
 	}
 
 
@@ -37,21 +37,21 @@ void PX::World::Init_Sym( size_t size, std::mt19937& rng )
 			walls.emplace_back();
 		}
 
-		walls [0].A = PX::Vec2 { 4.0f,4.0f };
-		walls [0].B = PX::Vec2 { float( Graphics::ScreenWidth - 4 ),4.0f };
-		walls [0].normal = PX::Vec2 { 0.0f,1.0f };
+		walls [0].A = Vec2 { 4.0f,4.0f };
+		walls [0].B = Vec2 { float( Graphics::ScreenWidth - 4 ),4.0f };
+		walls [0].normal = Vec2 { 0.0f,1.0f };
 
-		walls [1].A = PX::Vec2 { float( Graphics::ScreenWidth - 4 ),4.0f };
-		walls [1].B = PX::Vec2 { float( Graphics::ScreenWidth - 4 ),float( Graphics::ScreenHeight - 4 ) };
-		walls [1].normal = PX::Vec2 { -1.0f,0.0f };
+		walls [1].A = Vec2 { float( Graphics::ScreenWidth - 4 ),4.0f };
+		walls [1].B = Vec2 { float( Graphics::ScreenWidth - 4 ),float( Graphics::ScreenHeight - 4 ) };
+		walls [1].normal = Vec2 { -1.0f,0.0f };
 
-		walls [2].A = PX::Vec2 { float( Graphics::ScreenWidth - 4 ),float( Graphics::ScreenHeight - 4 ) };
-		walls [2].B = PX::Vec2 { 4.0f,float( Graphics::ScreenHeight - 4 ) };
-		walls [2].normal = PX::Vec2 { 0.0f,-1.0f };
+		walls [2].A = Vec2 { float( Graphics::ScreenWidth - 4 ),float( Graphics::ScreenHeight - 4 ) };
+		walls [2].B = Vec2 { 4.0f,float( Graphics::ScreenHeight - 4 ) };
+		walls [2].normal = Vec2 { 0.0f,-1.0f };
 
-		walls [3].A = PX::Vec2 { 4.0f,float( Graphics::ScreenHeight - 4 ) };
-		walls [3].B = PX::Vec2 { 4.0f,4.0f };
-		walls [3].normal = PX::Vec2 { 1.0f,0.0f };
+		walls [3].A = Vec2 { 4.0f,float( Graphics::ScreenHeight - 4 ) };
+		walls [3].B = Vec2 { 4.0f,4.0f };
+		walls [3].normal = Vec2 { 1.0f,0.0f };
 	}
 
 
@@ -71,7 +71,7 @@ void PX::World::Init_Sym( size_t size, std::mt19937& rng )
 
 void PX::World::Apply_Mouse_Imput( const Vec2 & pos )
 {
-	const PX::Vec2 p = pos - particles [0].Get_Pos();
+	const Vec2 p = pos - particles [0].Get_Pos();
 	particles [0].Apply_Impulse( p * 10.0f );	
 }
 
