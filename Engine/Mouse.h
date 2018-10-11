@@ -20,7 +20,7 @@
  ******************************************************************************************/
 #pragma once
 #include <queue>
-#include "PhyzX\PX_Math.h"
+#include "PX_Math.h"
 
 class Mouse
 {

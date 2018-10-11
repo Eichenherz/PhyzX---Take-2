@@ -1,8 +1,8 @@
 #pragma once
 
-#include "PhyzX\PX_Particle.h"
-#include "PhyzX\PX_Particle_Link.h"
-#include "PhyzX\PX_Collision.h"
+#include "PX_Particle.h"
+#include "PX_Particle_Link.h"
+#include "PX_Collision.h"
 #include <vector>
 #include <random>
 

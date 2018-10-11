@@ -1,7 +1,7 @@
-#include "PhyzX\PX_World.h"
+#include "PX_World.h"
 #include "Graphics.h"
 
-void PX::World::Init_Sym( size_t size, const std::mt19937& rng )
+void PX::World::Init_Sym( size_t size, std::mt19937& rng )
 {
 	particles.reserve( size );
 	for ( size_t i = 0; i < size; ++i )

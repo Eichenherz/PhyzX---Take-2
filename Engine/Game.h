@@ -25,7 +25,7 @@
 #include "Graphics.h"
 #include "Timer.h"
 #include <random>
-#include "PhyzX/PX_World.h"
+#include "PX_World.h"
 
 class Game
 {

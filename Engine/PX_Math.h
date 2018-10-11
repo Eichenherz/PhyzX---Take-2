@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cmath>
-#include "Matrix2.h"
 #include <array>
 
 namespace PX
