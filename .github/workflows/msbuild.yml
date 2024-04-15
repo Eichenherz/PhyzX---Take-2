@@ -37,6 +37,15 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: nuget restore ${{env.SOLUTION_FILE_PATH}}
 
+    - name: Setup Windows 10 SDK Action
+    # You may pin to the exact commit or the version.
+    # uses: GuillaumeFalourd/setup-windows10-sdk-action@0a9239b10b7407a4399e1a62438f090e013e3d68
+      uses: GuillaumeFalourd/setup-windows10-sdk-action@v2
+      with:
+        # SDK 5-digit version to install (e.g 17763, 18362, 19041)
+        sdk-version: 19041 # default is 18362
+          
+    
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
