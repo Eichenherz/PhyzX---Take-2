@@ -43,7 +43,7 @@ jobs:
       uses: GuillaumeFalourd/setup-windows10-sdk-action@v2
       with:
         # SDK 5-digit version to install (e.g 17763, 18362, 19041)
-        sdk-version: 17134 # default is 18362
+        sdk-version: 19041 # default is 18362
           
     
     - name: Build
